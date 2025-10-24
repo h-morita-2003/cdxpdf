@@ -1,4 +1,5 @@
 //pdfExtractor.ts
+//正規表現
 export interface StringData {
   totalAmount?: string;
   taxAmount?: string;
