@@ -1,10 +1,24 @@
 "use client";
-import { useState } from "react";
+import { Children, useState } from "react";
+import Link from "next/link";
+
+//設定項目
+type Setting = {
+  seikyuuGaku: number;
+  company: string;
+  hinmoku: string[];
+  tax: number;
+  shiharaibi: string;
+  jogai: string;
+}
+
 
 export default function Home() {
+  //ステート管理（現在、関数）＝usestate（初期値）
   const [result, setResult] = useState<any>(null);
   const [loading, setLoading] = useState(false);
 
+  //フォーム送信時に実行
   const handleUpload = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
@@ -24,6 +38,7 @@ export default function Home() {
     setLoading(true);
     setResult(null);
 
+    //PDF読み込みエラーの設定
     try {
       const res = await fetch("/api/parse", {
         method: "POST",
@@ -49,8 +64,21 @@ export default function Home() {
     }
   };
 
+//画面１
+  //ファイルをドラッグ＆ドロップ
   return (
     <div>
+      <></>
+      //設定ボタン
+      <div> 
+        <Link 
+         href = "/settings"
+         className="bg-blue-500 text-white px-4 py-2 rouded"
+         >設定
+         </Link>
+       </div>
+      //
+      //PDFファイル入力    
       <h1>本サイトにPDFを選択、またはドラッグ＆ドロップ</h1>
       <center>
         <form onSubmit={handleUpload}>
@@ -72,6 +100,7 @@ export default function Home() {
               {/* ✅ name="file" をつけるのも大事 */}
               <input type="file" name="file" accept="application/pdf" />
             </div>
+            //フォーム送信ボタン
             <button type="submit">実行</button>
           </div>
         </form>
@@ -79,6 +108,8 @@ export default function Home() {
 
       {loading && <p>解析中です…</p>}
 
+      //読み込み結果  
+      //検出されたら表示する
       {result && (
         <div style={{ marginTop: "20px" }}>
           <h2>抽出結果</h2>
