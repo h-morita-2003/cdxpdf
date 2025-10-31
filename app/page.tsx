@@ -68,7 +68,6 @@ export default function Home() {
   //ファイルをドラッグ＆ドロップ
   return (
     <div>
-      <></>
       //設定ボタン
       <div> 
         <Link 

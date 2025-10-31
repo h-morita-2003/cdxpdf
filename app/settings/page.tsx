@@ -17,12 +17,11 @@ export default function SettingPage(){
     const [company,SetCompany] = useState("");
     //品目（複数）
     //複数設定できるか？
-    const [hinmoku,SetHinmoku] = useState(); 
+    const [hinmoku,SetHinmoku] = useState(""); 
     //税率
     const [tax,SetTax] = useState<number>(0);
     //支払日
-    //　　　　　？型どうする？
-    const [shiharaibi,SetShiharaibi] = useState<number>(0);
+    const [shiharaibi,SetShiharaibi] = useState("");
     //除外
     const [jogai,SetJogai] = useState("");
     //ルーター（ページ遷移）設定
@@ -45,14 +44,47 @@ export default function SettingPage(){
             <h1 className="text-xl mb-4">設定画面</h1>
             //入力
             <input
+              type = "number"
+              placeholder = "請求金額"
+              value = {seikyuuGaku}
+              onChange = {(e) => SetSeikyuuGaku(Number(e.target.value))}
+              className = "border p-2 mb-2 block"
+            />
+            <input
+              type = "text"
+              placeholder = "会社名"
+              value = {company}
+              onChange = {(e) => SetCompany(e.target.value)}
+              className = "border p-2 mb-2 block"
+            />
+            <input
+              type="text"
+              placeholder="品目"
+              value = {hinmoku}
+              onChange = {(e) => SetHinmoku(e.target.value)}
+              className = "border p-2 mb-2 block"
+            />
+            <input
+              type = "number"
+              placeholder = "税率"
+              value = {tax}
+              onChange = {(e) => SetTax(Number(e.target.value))}
+              className = "border p-2 mb-2 block"
+            />
+            <input
               type="text"
               placeholder="支払日"
-              value={seikyuuGaku}
-              onChange={(e) => SetSeikyuuGaku(Number(e.target.value))}
-              className="border p-2 mb-2 block"
+              value = {shiharaibi}
+              onChange = {(e) => SetShiharaibi(e.target.value)}
+              className = "border p-2 mb-2 block"
             />
-            //つづく
-
+            <input
+              type="text"
+              placeholder="除外"
+              value = {jogai}
+              onChange = {(e) => SetJogai(e.target.value)}
+              className = "border p-2 mb-2 block"
+            />
 
             //設定保存ボタン
             //　　？必須項目を入れてないと保存できないようにしたい
@@ -60,8 +92,8 @@ export default function SettingPage(){
               onClick= {saveSettings}
               className = "bg-blue-500 text-white px-4 py-2 rounded"
             >
-            //戻るボタン
             </button>
+            //戻るボタン
             <Link
               href = "/"
               className = "bg-gray-500 text-white px-4 py-2 rounded"
