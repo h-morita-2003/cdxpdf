@@ -7,7 +7,7 @@ export default function Home() {
 
   const handleUpload = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setLoading(true);
+    
     const fileInput = e.currentTarget.querySelector(
       "input[type=file]"
     ) as HTMLInputElement;
