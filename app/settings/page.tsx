@@ -91,7 +91,7 @@ export default function SettingPage(){
             <button
               onClick= {saveSettings}
               className = "bg-blue-500 text-white px-4 py-2 rounded"
-            >
+            >設定保存
             </button>
             //戻るボタン
             <Link
