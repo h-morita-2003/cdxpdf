@@ -20,7 +20,7 @@ export default function Home() {
     // ✅ FormDataを自分で作って確実にfileをセット
     const formData = new FormData();
     formData.append("file", fileInput.files[0]);
-
+    //ここでtext処理かocrか判断する
     setLoading(true);
     setResult(null);
 
