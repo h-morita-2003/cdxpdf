@@ -2,15 +2,17 @@
 import { Children, useState } from "react";
 import Link from "next/link";
 
+//山下追加
 //設定項目
 type Setting = {
   seikyuuGaku: number;
   company: string;
-  hinmoku: string[];
+  hinmoku: string;
   tax: number;
   shiharaibi: string;
   jogai: string;
 }
+//山下追加終わり
 
 
 export default function Home() {
@@ -68,6 +70,8 @@ export default function Home() {
   //ファイルをドラッグ＆ドロップ
   return (
     <div>
+
+      //山下追加
       //設定ボタン
       <div> 
         <Link 
@@ -76,6 +80,8 @@ export default function Home() {
          >設定
          </Link>
        </div>
+      //山下追加終わり
+      
       //
       //PDFファイル入力    
       <h1>本サイトにPDFを選択、またはドラッグ＆ドロップ</h1>
