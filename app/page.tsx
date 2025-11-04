@@ -25,7 +25,8 @@ export default function Home() {
     setResult(null);
 
     try {
-      const res = await fetch("/api/parse", {
+       const formData = new FormData(e.currentTarget);
+       const res = await fetch("/api/parse", {
         method: "POST",
         body: formData,
       });
