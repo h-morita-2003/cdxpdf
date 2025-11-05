@@ -2,8 +2,8 @@
 import { Children, useState } from "react";
 import Link from "next/link";
 
-//山下追加
-//設定項目
+{/*山下追加
+  設定項目*/}
 type Setting = {
   seikyuuGaku: number;
   company: string;
@@ -12,15 +12,15 @@ type Setting = {
   shiharaibi: string;
   jogai: string;
 }
-//山下追加終わり
+{/*山下追加終わり*/}
 
 
 export default function Home() {
-  //ステート管理（現在、関数）＝usestate（初期値）
+  {/*ステート管理（現在、関数）＝usestate（初期値）*/}
   const [result, setResult] = useState<any>(null);
   const [loading, setLoading] = useState(false);
 
-  //フォーム送信時に実行
+  {/*フォーム送信時に実行*/}
   const handleUpload = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
@@ -40,7 +40,7 @@ export default function Home() {
     setLoading(true);
     setResult(null);
 
-    //PDF読み込みエラーの設定
+    {/*PDF読み込みエラーの設定*/}
     try {
       const res = await fetch("/api/parse", {
         method: "POST",
@@ -66,13 +66,13 @@ export default function Home() {
     }
   };
 
-//画面１
-  //ファイルをドラッグ＆ドロップ
+{/*画面１*/}
+{/*ファイルをドラッグ＆ドロップ*/}
   return (
     <div>
 
-      //山下追加
-      //設定ボタン
+      {/*山下追加*/}
+      {/*設定ボタン*/}
       <div> 
         <Link 
          href = "/settings"
@@ -80,10 +80,10 @@ export default function Home() {
          >設定
          </Link>
        </div>
-      //山下追加終わり
+      {/*山下追加終わり*/}
       
-      //
-      //PDFファイル入力    
+      
+      {/*PDFファイル入力*/}    
       <h1>本サイトにPDFを選択、またはドラッグ＆ドロップ</h1>
       <center>
         <form onSubmit={handleUpload}>
@@ -113,8 +113,8 @@ export default function Home() {
 
       {loading && <p>解析中です…</p>}
 
-      //読み込み結果  
-      //検出されたら表示する
+      {/*読み込み結果  
+      //検出されたら表示する*/}
       {result && (
         <div style={{ marginTop: "20px" }}>
           <h2>抽出結果</h2>
