@@ -4,7 +4,7 @@ import { spawn } from "child_process";
 import fs from "fs";
 import path from "path";
 
-export async function ocr_POST(req: NextRequest) {
+export async function POST(req: NextRequest) {
   console.log("📄 PDFを画像化中...");
   const formData = await req.formData();
   const file = formData.get("file") as File;
