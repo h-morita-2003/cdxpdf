@@ -27,7 +27,7 @@ export default function Home() {
     try {
        const formData = new FormData(e.currentTarget);
        const res = await fetch("/api/parse", {
-        method: "pdf_POST",
+        method: "POST",
         body: formData,
       });
 
