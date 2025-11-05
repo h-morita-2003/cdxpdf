@@ -4,12 +4,12 @@ import { NextResponse,NextRequest } from "next/server";
 import * as pdfjsLib from "pdfjs-dist/legacy/build/pdf.js"; // ← Node向けバージョンを指定
 // @ts-ignore
 import "pdfjs-dist/legacy/build/pdf.worker.js";
-import { pdfToPng } from "@/lib/pdfToImage";
-import { spawn } from "child_process";
-import fs from "fs";
-import path from "path";
+//import { pdfToPng } from "@/lib/pdfToImage";
+//import { spawn } from "child_process";
+//import fs from "fs";
+//import path from "path";
 
-export async function pdf_POST(req: Request) {
+export async function POST(req: Request) {
   try {
     const formData = await req.formData();
     const file = formData.get("file") as File | null;
