@@ -105,7 +105,7 @@ export default function Home() {
               {/* ✅ name="file" をつけるのも大事 */}
               <input type="file" name="file" accept="application/pdf" />
             </div>
-            //フォーム送信ボタン
+            {/*フォーム送信ボタン*/}
             <button type="submit">実行</button>
           </div>
         </form>
