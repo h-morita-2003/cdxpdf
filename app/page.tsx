@@ -73,7 +73,7 @@ export default function Home() {
 
       {/*山下追加*/}
       {/*設定ボタン*/}
-      <div> 
+      <div className="flex gap-4"> 
         <Link 
          href = "/settings"
          className="bg-blue-500 text-white px-4 py-2 rouded"

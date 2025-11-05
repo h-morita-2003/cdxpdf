@@ -38,7 +38,9 @@ export default function SettingPage(){
            (company === "" ) &&
            (shiharaibi === "" ) &&
            (jogai === "")){
-              console.error("")
+              {/*必須項目がないとエラー */}
+              console.error("　必須項目未入力　")
+              alert("必須項目を入力してください")
            }else{
               //設定保存メソッドを呼び出し
               await fetch("/api/settings",{
@@ -49,9 +51,8 @@ export default function SettingPage(){
             };
 
     };
-    //
-    //
-    //input画面
+    
+    {/*input画面*/}
     return(
         <div className="p-6">
             <h1 className="text-xl mb-4">設定画面</h1>
@@ -106,6 +107,7 @@ export default function SettingPage(){
             />
 
             {/*設定保存ボタン*/}
+            <div className="flex gap-12">
             <button
               onClick= {saveSettings}
               className = "bg-blue-500 text-white px-4 py-2 rounded"
@@ -118,6 +120,7 @@ export default function SettingPage(){
             >
               戻る
             </Link>
+            </div>
         </div>
     ) 
 
