@@ -25,9 +25,39 @@ export default function Home() {
     setResult(null);
 
     try {
-       const formData = new FormData(e.currentTarget);
-       const res = await fetch("/api/parse", {
+      const input = e.currentTarget.querySelector("input[type=file]") as HTMLInputElement;
+      if (!input.files?.[0]) return alert("PDFを選択してください");
+
+      const file = input.files[0];
+      const formData = new FormData();
+      formData.append("file", file);
+
+      // ▼ まずPDFからテキストを抽出して単語数を判定
+      const wordCountRes = await fetch("/api/parse/wordcount/count/count", {
         method: "POST",
+        body: formData,
+      });
+      const wordData = await wordCountRes.json();
+      const wordCount = wordData.wordCount ?? 0;
+
+      console.log("🧩 PDF単語数:", wordCount);
+
+      // ▼ テキストがあるかないかで処理先を分岐
+      let apiUrl = "";
+      let apiMethod = "POST";
+
+      if (wordCount > 0) {
+        console.log("✅ テキストPDF → /api/parse に送信");
+        apiUrl = "/api/parse";
+        apiMethod = "POST"; // ← method名は 'pdf_POST' ではなく 'POST'！
+      } else {
+        console.log("🖼 画像PDF → /api/parse/ocr に送信");
+        apiUrl = "/api/parse/ocr";
+        apiMethod = "POST"; // ← 'ocr_POST' ではなく 'POST'
+      }
+
+      const res = await fetch(apiUrl, {
+        method: apiMethod,
         body: formData,
       });
 
@@ -35,20 +65,19 @@ export default function Home() {
 
       if (!res.ok) {
         const text = await res.text();
-        console.error("⚠️ APIエラー HTML:", text);
+        console.error("⚠️ APIエラー応答:", text);
         throw new Error(`APIエラー: ${res.status}`);
       }
 
       const data = await res.json();
       console.log("📜 レスポンス body:", data);
-      setResult(data.result);
+      setResult(data);
     } catch (err) {
-      console.error("❌ フロント側エラー:", err);
-      alert("解析中にエラーが発生しました。");
+      console.error("❌ エラー:", err);
+      setResult({ error: "処理中にエラーが発生しました" });
     } finally {
       setLoading(false);
     }
-
   };
 
   return (
