@@ -5,12 +5,8 @@ import Link from "next/link";
 {/*山下追加
   設定項目*/}
 type Setting = {
-  seikyuuGaku: number;
-  company: string;
-  hinmoku: string;
-  tax: number;
-  shiharaibi: string;
-  jogai: string;
+  item: string;
+  keywords: string;
 }
 {/*山下追加終わり*/}
 

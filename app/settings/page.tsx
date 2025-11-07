@@ -14,27 +14,32 @@ import Link from "next/link";
 export default function SettingPage(){
     //設定項目を用意
     //useState[項目名,更新するための関数]= useState(初期値)
+
     //請求金額
-    const [seikyuuGaku,SetSeikyuuGaku] = useState<number>(0);
+    //const [seikyuuGaku,SetSeikyuuGaku] = useState<number>(0);
+    const [seikyuuGaku,SetSeikyuuGaku] = useState("");
     //会社名
     const [company,SetCompany] = useState("");
-    //品目（複数）
-    //複数設定できるか？
+    //品目
     const [hinmoku,SetHinmoku] = useState(""); 
-    //税率
-    const [tax,SetTax] = useState<number>(0);
+    //消費税
+    //const [tax,SetTax] = useState<number>(0);
+    const [tax,SetTax] = useState("");
     //支払日
     const [shiharaibi,SetShiharaibi] = useState("");
     //除外
     const [jogai,SetJogai] = useState("");
+
+    
     //ルーター（ページ遷移）設定
     const router = useRouter;
     //
     //
-    //設定保存ボタンの設定
+    //設定保存ボタン押下
     const saveSettings = async () => {
         //必須項目が設定されているかの確認
-        if ((seikyuuGaku === 0 ) &&
+        if (
+           ((seikyuuGaku === "0" )||(seikyuuGaku === "")) &&
            (company === "" ) &&
            (shiharaibi === "" ) &&
            (jogai === "")){
@@ -46,7 +51,17 @@ export default function SettingPage(){
               await fetch("/api/settings",{
                 method : "post",
                 headers : {"Content-type": "application/json"},
-                body : JSON.stringify({seikyuuGaku,company,hinmoku,tax,shiharaibi,jogai}),
+                body : JSON.stringify({
+                  items:[
+                    { item: "請求金額" , keywords: seikyuuGaku },
+                    { item: "会社名" , keywords: company },
+                    { item: "品目" , keywords: hinmoku },
+                    { item: "消費税" , keywords: tax },
+                    { item: "支払日" , keywords: shiharaibi },
+                    { item: "除外" , keywords: jogai },
+                  ],
+                  seikyuuGaku,company,hinmoku,tax,shiharaibi,jogai
+                }),
               });
             };
 
@@ -59,11 +74,12 @@ export default function SettingPage(){
             {/*入力*/}
             <h1>請求金額</h1>
             <input
-              type = "number"
+              type = "text"
               placeholder = "請求金額"
               value = {seikyuuGaku}
-              onChange = {(e) => SetSeikyuuGaku(Number(e.target.value))}
-              className = "border p-2 mb-2 block"
+              //onChange = {(e) => SetSeikyuuGaku(Number(e.target.value))}
+              onChange = {(e) => SetSeikyuuGaku(e.target.value)}
+              className = "border p-2 mb-2 block w-4/5"
             />
             <h1>会社名</h1>
             <input
@@ -71,23 +87,23 @@ export default function SettingPage(){
               placeholder = "会社名"
               value = {company}
               onChange = {(e) => SetCompany(e.target.value)}
-              className = "border p-2 mb-2 block"
+              className = "border p-2 mb-2 block w-4/5"
             />
-            <h1>品目（,で複数入力可）</h1>
+            <h1>品目</h1>
             <input
               type="text"
               placeholder="品目"
               value = {hinmoku}
               onChange = {(e) => SetHinmoku(e.target.value)}
-              className = "border p-2 mb-2 block"
+              className = "border p-2 mb-2 block w-4/5"
             />
-            <h1>税率</h1>
+            <h1>消費税</h1>
             <input
-              type = "number"
-              placeholder = "税率"
+              type = "text"
+              placeholder = "消費税"
               value = {tax}
-              onChange = {(e) => SetTax(Number(e.target.value))}
-              className = "border p-2 mb-2 block"
+              onChange = {(e) => SetTax(e.target.value)}
+              className = "border p-2 mb-2 block w-4/5"
             />
             <h1>支払日</h1>
             <input
@@ -95,7 +111,7 @@ export default function SettingPage(){
               placeholder="支払日"
               value = {shiharaibi}
               onChange = {(e) => SetShiharaibi(e.target.value)}
-              className = "border p-2 mb-2 block"
+              className = "border p-2 mb-2 block w-4/5"
             />
             <h1>除外したい会社名</h1>
             <input
@@ -103,11 +119,11 @@ export default function SettingPage(){
               placeholder="除外"
               value = {jogai}
               onChange = {(e) => SetJogai(e.target.value)}
-              className = "border p-2 mb-2 block"
+              className = "border p-2 mb-2 block w-4/5"
             />
 
             {/*設定保存ボタン*/}
-            <div className="flex gap-12">
+            <div className="flex gap-8">
             <button
               onClick= {saveSettings}
               className = "bg-blue-500 text-white px-4 py-2 rounded"
