@@ -21,7 +21,8 @@ export async function POST(req: NextRequest) {
   console.log("🔍 OCR処理中...");
 
   // Node スクリプトを実行
-  const proc = spawn("node", ["./server/runOCR.js", tmpPath]);
+  const ocrScript = "C:\\Users\\h.morita\\pdfcdx\\server\\runOCR.js";
+  const proc = spawn("node", [ocrScript, tmpPath]);
 
   let output = "";
   let errorOutput = "";
