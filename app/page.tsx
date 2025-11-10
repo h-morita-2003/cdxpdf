@@ -70,8 +70,8 @@ export default function Home() {
       }
 
       const data = await res.json();
-      console.log("📜 レスポンス body:", data);
-      setResult(data);
+      console.log("📜 レスポンス body:", data.result);
+      setResult(data.result);
     } catch (err) {
       console.error("❌ エラー:", err);
       setResult({ error: "処理中にエラーが発生しました" });
@@ -113,18 +113,18 @@ export default function Home() {
       {result && (
         <div style={{ marginTop: "20px" }}>
           <h2>抽出結果</h2>
-          <p>📌 請求金額（税込）: {result.totalAmount ?? "未検出"}</p>
-          {result.totalAmount && result.taxAmount && (
+          <p>📌 請求金額（税込）: {result.total ?? "未検出"}</p>
+          {result.total && result.tax && (
           <p>📌 本体価格（税抜）:{" "}
               {
                // カンマ削除 → 数値化 → 差分計算 → カンマ付き出力
                 (
-                Number(result.totalAmount.replace(/,/g, "")) -
-                Number(result.taxAmount.replace(/,/g, ""))
+                Number(result.total.replace(/,/g, "")) -
+                Number(result.tax.replace(/,/g, ""))
                 ).toLocaleString()
                }</p>
               )}
-          <p>📌 消費税価格　　　: {result.taxAmount ?? "未検出"}</p>
+          <p>📌 消費税価格　　　: {result.tax ?? "未検出"}</p>
           <h3>📋 項目</h3>
           <ul>
             {result.items && result.items.length > 0 ? (

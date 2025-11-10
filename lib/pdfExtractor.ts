@@ -1,8 +1,8 @@
 //pdfExtractor.ts
 //正規表現
 export interface StringData {
-  totalAmount?: string;
-  taxAmount?: string;
+  total?: string;
+  tax?: string;
   companyName?: string;
   items: { description: string; amount: string }[];
 }
@@ -16,14 +16,14 @@ export async function extractStringData(text: string): Promise<StringData> {
     const totalMatch =
       text.match(/(小計|本体\（合計金額\）   |各合計|項|8%対象\(軽減税率対象\)|ヶ月|本体金額計  ¥0)[:：]?\s*¥?([\d,]+)\s*円?/);
       console.log(`請求金額 ${totalMatch}`)
-     if (totalMatch) result.totalAmount = result.totalAmount = (Number(totalMatch[2].replace(/,/g, "")) * 1.1).toLocaleString();
+     if (totalMatch) result.total = result.total = (Number(totalMatch[2].replace(/,/g, "")) * 1.1).toLocaleString();
 
 
     // 消費税
     const taxMatch =
       text.match(/(消費税額|税抜金額|各合計|項|8%対象\(軽減税率対象\)|10％対象|1   ヶ月|株式会社|本体金額計  ¥0)[:：]?\s*¥?([\d,]+)\s*円?/);
       console.log(`消費税 ${taxMatch}`)
-    if (taxMatch) result.taxAmount = (Number(taxMatch[2].replace(/,/g, "")) / 10).toLocaleString();
+    if (taxMatch) result.tax = (Number(taxMatch[2].replace(/,/g, "")) / 10).toLocaleString();
     
     // 項目抽出
     
