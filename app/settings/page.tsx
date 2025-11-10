@@ -38,15 +38,14 @@ export default function SettingPage(){
     //設定保存ボタン押下
     const saveSettings = async () => {
         //必須項目が設定されているかの確認
-        if (
-           ((seikyuuGaku === "0" )||(seikyuuGaku === "")) &&
-           (company === "" ) &&
-           (shiharaibi === "" ) &&
-           (jogai === "")){
+        if ( (seikyuuGaku === "") || 
+             (company === "" ) ||
+             (shiharaibi === "" ) || 
+             (jogai === "")){
               {/*必須項目がないとエラー */}
               console.error("　必須項目未入力　")
               alert("必須項目を入力してください")
-           }else{
+           } else {            
               //設定保存メソッドを呼び出し
               await fetch("/api/settings",{
                 method : "post",
@@ -60,7 +59,6 @@ export default function SettingPage(){
                     { item: "支払日" , keywords: shiharaibi },
                     { item: "除外" , keywords: jogai },
                   ],
-                  seikyuuGaku,company,hinmoku,tax,shiharaibi,jogai
                 }),
               });
             };
@@ -72,7 +70,7 @@ export default function SettingPage(){
         <div className="p-6">
             <h1 className="text-xl mb-4">設定画面</h1>
             {/*入力*/}
-            <h1>請求金額</h1>
+            <h1>請求金額（必須）</h1>
             <input
               type = "text"
               placeholder = "請求金額"
@@ -81,7 +79,7 @@ export default function SettingPage(){
               onChange = {(e) => SetSeikyuuGaku(e.target.value)}
               className = "border p-2 mb-2 block w-4/5"
             />
-            <h1>会社名</h1>
+            <h1>会社名（必須）</h1>
             <input
               type = "text"
               placeholder = "会社名"
@@ -105,7 +103,7 @@ export default function SettingPage(){
               onChange = {(e) => SetTax(e.target.value)}
               className = "border p-2 mb-2 block w-4/5"
             />
-            <h1>支払日</h1>
+            <h1>支払日（必須）</h1>
             <input
               type="text"
               placeholder="支払日"
@@ -113,7 +111,7 @@ export default function SettingPage(){
               onChange = {(e) => SetShiharaibi(e.target.value)}
               className = "border p-2 mb-2 block w-4/5"
             />
-            <h1>除外したい会社名</h1>
+            <h1>除外したい会社（必須）</h1>
             <input
               type="text"
               placeholder="除外"
