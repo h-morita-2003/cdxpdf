@@ -118,13 +118,13 @@ export default function Home() {
           <p>📌 本体価格（税抜）:{" "}
               {
                // カンマ削除 → 数値化 → 差分計算 → カンマ付き出力
-                (
+                result.total && result.tax? Math.round(
                 Number(result.total.replace(/,/g, "")) -
                 Number(result.tax.replace(/,/g, ""))
                 ).toLocaleString()
-               }</p>
+               :"未検出"}</p>
               )}
-          <p>📌 消費税価格　　　: {result.tax ?? "未検出"}</p>
+          <p>📌 消費税価格　　　: {result.tax? Math.round(Number(result.tax.replace(/,/g, ""))).toLocaleString(): "未検出"}</p>
           <h3>📋 項目</h3>
           <ul>
             {result.items && result.items.length > 0 ? (
