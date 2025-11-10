@@ -13,16 +13,14 @@ datasource db {
 //
 generator client {
   provider = "prisma-client-js"
-  output   = "../generated/prisma"
+//  output   = "../generated/prisma"
+  output   = "node_modules/@prisma/client"
 }
+
 
 model Setting {
   id               Int    @id @default(autoincrement())
-  seikyuuGaku      Int
-  company          String
-  hinmoku          String
-  tax              Int
-  shiharaibi       String
-  jogai            String
+  item             String @unique
+  keywords         String
   createdAT DateTime @default(now())
 }
