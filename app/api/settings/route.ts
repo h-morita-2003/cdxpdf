@@ -5,8 +5,9 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 
 //設定を上書き保存
-export async function post (req:Request){
+export async function POST(req:Request){
     try{
+      console.log("aaa");
       const data = await req.json();
 
       //データをDBに上書き保存
@@ -15,8 +16,8 @@ export async function post (req:Request){
         //
         await prisma.setting.upsert({
             where: {item:row.item},
-            update: {set:row.set},
-            create: {item:row.item, set:row.set},
+            update: {keywords:row.keywords},
+            create: {item:row.item, keywords:row.keywords},
         })
           }
         // });
@@ -32,10 +33,13 @@ export async function post (req:Request){
 //変える
 export async function GET() {
     try{
-      const settings = await prisma.setting.findMany();
-    //      orderBy : {created:"desc"},
-    //      take : 1, //最新の設定を1件取得
+      //itemとkeywordsのみ取得
+      const settings = await prisma.setting.findMany({
+        select:{ item: true, keywords: true }
+      });
+    //      
       return NextResponse.json(settings);  
+
     //
     //取得エラーの場合出力
     }catch(error){

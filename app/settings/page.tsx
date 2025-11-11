@@ -4,7 +4,7 @@
 {/*設定ページ*/}
 
 //
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 
@@ -30,39 +30,108 @@ export default function SettingPage(){
     //除外
     const [jogai,SetJogai] = useState("");
 
+    //
+    const [loading,setLoding] = useState(true);
+    const [error,setError] = useState< string | null >(null);
+
     
     //ルーター（ページ遷移）設定
-    const router = useRouter;
+    const router = useRouter();
     //
+
+    //初期表示時にDBから値を取得しstateにセット
+    useEffect(() => {
+      const fetchSettings = async () => {
+        try{
+          const res = await fetch("/api/settings");
+          //
+          if(!res.ok) throw new Error('取得エラー: ${res.status}');
+          const settings: { item:string; keywords:string }[] = await res.json();
+          //
+          //const map = Object.fromEntries(data.map(s => [s.item,s.keywords]));
+        
+          //setting配列をループして該当するstateをセット
+          for (const s of settings){
+            switch(s.item){
+              case "請求金額":
+                SetSeikyuuGaku(s.keywords ?? "");
+                break;
+              case "会社名":
+                SetCompany(s.keywords ?? "");
+                break;
+              case "品目":
+                SetHinmoku(s.keywords ?? "");
+                break;
+              case "消費税":
+                SetTax(s.keywords ?? "");
+                break;
+              case "支払日":
+                SetShiharaibi(s.keywords ?? "");
+                break;
+              case "除外":
+                SetJogai(s.keywords ?? "");
+              break;
+              default:
+                //上記以外
+                console.error("設定取得項目エラー", s.item);
+            }
+          }
+          //入力欄が空白に見えないようにするためfalse
+          setLoding(false);
+        }catch(err: any){
+          console.error("設定取得失敗エラー",err);
+          setError(String(err.message ?? err));
+          setLoding(false);
+        }
+      };
+
+      fetchSettings();
+    },[]
+    );
+
     //
     //設定保存ボタン押下
     const saveSettings = async () => {
+      console.log("設定保存ボタン 押下");
         //必須項目が設定されているかの確認
         if ( (seikyuuGaku === "") || 
              (company === "" ) ||
              (shiharaibi === "" ) || 
              (jogai === "")){
               {/*必須項目がないとエラー */}
-              console.error("　必須項目未入力　")
+              console.error("必須項目未入力")
               alert("必須項目を入力してください")
-           } else {            
-              //設定保存メソッドを呼び出し
-              await fetch("/api/settings",{
-                method : "post",
-                headers : {"Content-type": "application/json"},
-                body : JSON.stringify({
-                  items:[
-                    { item: "請求金額" , keywords: seikyuuGaku },
-                    { item: "会社名" , keywords: company },
-                    { item: "品目" , keywords: hinmoku },
-                    { item: "消費税" , keywords: tax },
-                    { item: "支払日" , keywords: shiharaibi },
-                    { item: "除外" , keywords: jogai },
-                  ],
-                }),
-              });
-            };
+              return;
+           }          
+           
+           try{
+            //設定保存メソッドを呼び出し
+             const res = await fetch("/api/settings",{
+              method : "post",
+              headers : {"Content-type": "application/json"},
+              body : JSON.stringify({
+                items:[
+                  { item: "請求金額" , keywords: seikyuuGaku },
+                  { item: "会社名" , keywords: company },
+                  { item: "品目" , keywords: hinmoku },
+                  { item: "消費税" , keywords: tax },
+                  { item: "支払日" , keywords: shiharaibi },
+                  { item: "除外" , keywords: jogai },
+                ],
+              }),
+            });
 
+            const hozonResult = await res.json();
+            console.log("保存結果", hozonResult);
+            if(res.ok) {
+              alert("保存しました")
+            }else{
+              throw new Error(hozonResult?.error || "保存に失敗しました")}
+           }catch(err:any){
+            console.error("設定保存エラー",err);
+            alert("保存に失敗しました" + (err.message ?? err))
+           }
+           
     };
     
     {/*input画面*/}
