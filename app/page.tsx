@@ -19,7 +19,7 @@ export default function Home() {
   {/*フォーム送信時に実行*/}
   const handleUpload = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-
+    
     const fileInput = e.currentTarget.querySelector(
       "input[type=file]"
     ) as HTMLInputElement;
@@ -32,14 +32,45 @@ export default function Home() {
     // ✅ FormDataを自分で作って確実にfileをセット
     const formData = new FormData();
     formData.append("file", fileInput.files[0]);
-
+    //ここでtext処理かocrか判断する
     setLoading(true);
     setResult(null);
 
     {/*PDF読み込みエラーの設定*/}
     try {
-      const res = await fetch("/api/parse", {
+      const input = e.currentTarget.querySelector("input[type=file]") as HTMLInputElement;
+      if (!input.files?.[0]) return alert("PDFを選択してください");
+
+      const file = input.files[0];
+      const formData = new FormData();
+      formData.append("file", file);
+
+      // ▼ まずPDFからテキストを抽出して単語数を判定
+      const wordCountRes = await fetch("/api/parse/wordcount/count/count", {
         method: "POST",
+        body: formData,
+      });
+      const wordData = await wordCountRes.json();
+      const wordCount = wordData.wordCount ?? 0;
+
+      console.log("🧩 PDF単語数:", wordCount);
+
+      // ▼ テキストがあるかないかで処理先を分岐
+      let apiUrl = "";
+      let apiMethod = "POST";
+
+      if (wordCount > 0) {
+        console.log("✅ テキストPDF → /api/parse に送信");
+        apiUrl = "/api/parse";
+        apiMethod = "POST"; // ← method名は 'pdf_POST' ではなく 'POST'！
+      } else {
+        console.log("🖼 画像PDF → /api/parse/ocr に送信");
+        apiUrl = "/api/parse/ocr";
+        apiMethod = "POST"; // ← 'ocr_POST' ではなく 'POST'
+      }
+
+      const res = await fetch(apiUrl, {
+        method: apiMethod,
         body: formData,
       });
 
@@ -47,16 +78,16 @@ export default function Home() {
 
       if (!res.ok) {
         const text = await res.text();
-        console.error("⚠️ APIエラー HTML:", text);
+        console.error("⚠️ APIエラー応答:", text);
         throw new Error(`APIエラー: ${res.status}`);
       }
 
       const data = await res.json();
-      console.log("📜 レスポンス body:", data);
+      console.log("📜 レスポンス body:", data.result);
       setResult(data.result);
     } catch (err) {
-      console.error("❌ フロント側エラー:", err);
-      alert("解析中にエラーが発生しました。");
+      console.error("❌ エラー:", err);
+      setResult({ error: "処理中にエラーが発生しました" });
     } finally {
       setLoading(false);
     }
@@ -114,18 +145,18 @@ export default function Home() {
       {result && (
         <div style={{ marginTop: "20px" }}>
           <h2>抽出結果</h2>
-          <p>📌 請求金額（税込）: {result.totalAmount ?? "未検出"}</p>
-          {result.totalAmount && result.taxAmount && (
+          <p>📌 請求金額（税込）: {result.total ?? "未検出"}</p>
+          {result.total && result.tax && (
           <p>📌 本体価格（税抜）:{" "}
               {
                // カンマ削除 → 数値化 → 差分計算 → カンマ付き出力
-                (
-                Number(result.totalAmount.replace(/,/g, "")) -
-                Number(result.taxAmount.replace(/,/g, ""))
+                result.total && result.tax? Math.round(
+                Number(result.total.replace(/,/g, "")) -
+                Number(result.tax.replace(/,/g, ""))
                 ).toLocaleString()
-               }</p>
+               :"未検出"}</p>
               )}
-          <p>📌 消費税価格　　　: {result.taxAmount ?? "未検出"}</p>
+          <p>📌 消費税価格　　　: {result.tax? Math.round(Number(result.tax.replace(/,/g, ""))).toLocaleString(): "未検出"}</p>
           <h3>📋 項目</h3>
           <ul>
             {result.items && result.items.length > 0 ? (

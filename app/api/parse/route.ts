@@ -1,9 +1,10 @@
 import { extractStringData } from "@/lib/pdfExtractor";
-import { NextResponse } from "next/server";
+import { NextResponse,NextRequest } from "next/server";
 // @ts-ignore
 import * as pdfjsLib from "pdfjs-dist/legacy/build/pdf.js"; // ← Node向けバージョンを指定
 // @ts-ignore
 import "pdfjs-dist/legacy/build/pdf.worker.js";
+
 
 export async function POST(req: Request) {
   try {
