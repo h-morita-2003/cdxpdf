@@ -6,7 +6,6 @@ export default function Home() {
   const [loading, setLoading] = useState(false);
   const [judgementText, setJudementText] = useState(false);
   const [judgementImage, setJudementImage] = useState(false);
-  const [fileType, setFileType] = useState<"text" | "image" | null>(null);
   const handleUpload = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     
