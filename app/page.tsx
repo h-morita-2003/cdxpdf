@@ -4,7 +4,9 @@ import { useState } from "react";
 export default function Home() {
   const [result, setResult] = useState<any>(null);
   const [loading, setLoading] = useState(false);
-
+  const [judgementText, setJudementText] = useState(false);
+  const [judgementImage, setJudementImage] = useState(false);
+  const [fileType, setFileType] = useState<"text" | "image" | null>(null);
   const handleUpload = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     
@@ -38,6 +40,7 @@ export default function Home() {
         body: formData,
       });
       const wordData = await wordCountRes.json();
+      console.log("🔍 wordData:", wordData);
       const wordCount = wordData.wordCount ?? 0;
 
       console.log("🧩 PDF単語数:", wordCount);
@@ -45,15 +48,18 @@ export default function Home() {
       // ▼ テキストがあるかないかで処理先を分岐
       let apiUrl = "";
       let apiMethod = "POST";
-
+      setJudementText(false);
+      setJudementImage(false);
       if (wordCount > 0) {
         console.log("✅ テキストPDF → /api/parse に送信");
         apiUrl = "/api/parse";
         apiMethod = "POST"; // ← method名は 'pdf_POST' ではなく 'POST'！
+        setJudementText(true);
       } else {
         console.log("🖼 画像PDF → /api/parse/ocr に送信");
         apiUrl = "/api/parse/ocr";
         apiMethod = "POST"; // ← 'ocr_POST' ではなく 'POST'
+        setJudementImage(true);
       }
 
       const res = await fetch(apiUrl, {
@@ -69,6 +75,7 @@ export default function Home() {
         throw new Error(`APIエラー: ${res.status}`);
       }
 
+      
       const data = await res.json();
       console.log("📜 レスポンス body:", data.result);
       setResult(data.result);
@@ -112,7 +119,10 @@ export default function Home() {
 
       {result && (
         <div style={{ marginTop: "20px" }}>
+
           <h2>抽出結果</h2>
+          {judgementText &&<h3>このPDFはテキスト型です✐</h3>}
+          {judgementImage &&<h3>このPDFは画像型です🖼</h3>}
           <p>📌 請求金額（税込）: {result.total ?? "未検出"}</p>
           {result.total && result.tax && (
           <p>📌 本体価格（税抜）:{" "}
@@ -142,4 +152,5 @@ export default function Home() {
       )}
     </div>
   );
+
 }
