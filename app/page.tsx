@@ -1,7 +1,18 @@
 "use client";
-import { useState } from "react";
+import { Children, useState } from "react";
+import Link from "next/link";
+
+{/*山下追加
+  設定項目*/}
+type Setting = {
+  item: string;
+  keywords: string;
+}
+{/*山下追加終わり*/}
+
 
 export default function Home() {
+  {/*ステート管理（現在、関数）＝usestate（初期値）*/}
   const [result, setResult] = useState<any>(null);
   const [loading, setLoading] = useState(false);
   const [judgementText, setJudementText] = useState(false);
@@ -25,6 +36,7 @@ export default function Home() {
     setLoading(true);
     setResult(null);
 
+    {/*PDF読み込みエラーの設定*/}
     try {
       const input = e.currentTarget.querySelector("input[type=file]") as HTMLInputElement;
       if (!input.files?.[0]) return alert("PDFを選択してください");
@@ -86,8 +98,24 @@ export default function Home() {
     }
   };
 
+{/*画面１*/}
+{/*ファイルをドラッグ＆ドロップ*/}
   return (
     <div>
+
+      {/*山下追加*/}
+      {/*設定ボタン*/}
+      <div className="flex gap-4"> 
+        <Link 
+         href = "/settings"
+         className="bg-blue-500 text-white px-4 py-2 rouded"
+         >設定
+         </Link>
+       </div>
+      {/*山下追加終わり*/}
+      
+      
+      {/*PDFファイル入力*/}    
       <h1>本サイトにPDFを選択、またはドラッグ＆ドロップ</h1>
       <center>
         <form onSubmit={handleUpload}>
@@ -109,6 +137,7 @@ export default function Home() {
               {/* ✅ name="file" をつけるのも大事 */}
               <input type="file" name="file" accept="application/pdf" />
             </div>
+            {/*フォーム送信ボタン*/}
             <button type="submit">実行</button>
           </div>
         </form>
@@ -116,6 +145,8 @@ export default function Home() {
 
       {loading && <p>解析中です…</p>}
 
+      {/*読み込み結果  
+      //検出されたら表示する*/}
       {result && (
         <div style={{ marginTop: "20px" }}>
 
