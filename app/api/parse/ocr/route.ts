@@ -73,6 +73,15 @@ export async function POST(req: NextRequest) {
       //税率:KeyTax
       //支払日:KeyShiharaibi
       //除外:KeyJogai
+      
+      //正規表現（RegExp）型に変換
+      const RegKeySeikyuugaku = new RegExp(KeySeikyuugaku);
+      const RegKeyCompany = new RegExp(KeyCompany);
+      const RegKeyHinmoku = new RegExp(KeyHinmoku);
+      const RegKeyTax = new RegExp(KeyTax);
+      const RegKeyShiharaibi = new RegExp(KeyShiharaibi);
+      const RegKeyJogai = new RegExp(KeyJogai);
+    
   {/* 山下追加終わり　*/}
 
   console.log("📄 PDFを画像化中...");
@@ -118,9 +127,11 @@ export async function POST(req: NextRequest) {
   // 🔍 OCR全文をターミナルに出力
   console.log("🧠 OCR結果全文:\n" + (output.trim() || "(空の結果)"));
 
-  const totalMatch = output.match(/(?: 計 |L_ 1i0%\s*\|)[:：]?\s*¥?\s*([\d,]+)\s*円?/);
+  //const totalMatch = output.match(/(?: 計 |L_ 1i0%\s*\|)[:：]?\s*¥?\s*([\d,]+)\s*円?/);
+  const totalMatch = output.match(RegKeySeikyuugaku);
   
-  const taxMatch = output.match(/(?: 計 |L_ 1i0%\s*\|)[:：]?\s*¥?\s*([\d,]+)\s*円?/);
+  //const taxMatch = output.match(/(?: 計 |L_ 1i0%\s*\|)[:：]?\s*¥?\s*([\d,]+)\s*円?/);
+  const taxMatch = output.match(RegKeyTax);
 
   const extracted = {
     total: totalMatch?.[1] ?? "未検出",
