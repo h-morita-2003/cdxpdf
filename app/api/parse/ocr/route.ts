@@ -133,10 +133,15 @@ export async function POST(req: NextRequest) {
   //const taxMatch = output.match(/(?: 計 |L_ 1i0%\s*\|)[:：]?\s*¥?\s*([\d,]+)\s*円?/);
   const taxMatch = output.match(RegKeyTax);
   console.log(RegKeyTax);
+  //日付
+  const dayMatch =output.match(RegKeyShiharaibi);
+  console.log(RegKeyShiharaibi);
+  
 
   const extracted = {
     total: totalMatch?.[1] ?? "未検出",
     tax: taxMatch?.[1] ?? "未検出",
+    day: dayMatch?.[0] ?? "未検出",
   };
  if (totalMatch) extracted.total = Math.round(Number(totalMatch[1].replace(/,/g, "")) * 1.1).toLocaleString();
  if (taxMatch) extracted.tax = (Number(taxMatch[1].replace(/,/g, "")) / 10).toLocaleString();
