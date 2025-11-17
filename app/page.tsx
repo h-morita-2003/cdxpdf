@@ -177,6 +177,7 @@ export default function Home() {
               <li>項目なし</li>
             )}
           </ul>
+          <p>発行日:{result.day ?? "不明"}{result.day && (result.day.includes("年") || result.day.includes("月")) ? "日" : ""}</p>
           <p>🏢 発行元会社: {result.companyName ?? "不明"}</p>
         </div>
       )}

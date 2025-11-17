@@ -8,6 +8,7 @@ export interface StringData {
   tax?: string;
   companyName?: string;
   items: { description: string; amount: string }[];
+  day?: string;
 }
 
   {/* 山下追加　*/}
@@ -107,7 +108,12 @@ export async function extractStringData(text: string): Promise<StringData> {
     if (taxMatch) result.tax = (Number(taxMatch[2].replace(/,/g, "")) / 10).toLocaleString();
     
     // 項目抽出
-    
+    // 支払い日
+
+    const dayMatch =
+     text.match(RegKeyShiharaibi);
+     console.log(`西暦月日 ${dayMatch}`)
+     result.day = dayMatch?.[0] ?? "";
     //const itemRegex = /(\S+)\s+¥?([\d,]+)\s*円?/g;
     const itemRegex = RegKeyHinmoku;
     let match;
