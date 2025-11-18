@@ -132,26 +132,20 @@ export async function POST(req: NextRequest) {
   // 🔍 OCR全文をターミナルに出力
   console.log("🧠 OCR結果全文:\n" + (output.trim() || "(空の結果)"));
 
+
+  //
   //const totalMatch = output.match(/(?: 計 |L_ 1i0%\s*\|)[:：]?\s*¥?\s*([\d,]+)\s*円?/);
-  const totalMatch = output.match(RegKeySeikyuugaku);
-  console.log(RegKeySeikyuugaku);
-  //const taxMatch = output.match(/(?: 計 |L_ 1i0%\s*\|)[:：]?\s*¥?\s*([\d,]+)\s*円?/);
-  const taxMatch = output.match(RegKeyTax);
-  console.log(RegKeyTax);
-  //日付
-  const dayMatch =output.match(RegKeyShiharaibi);
-  console.log(RegKeyShiharaibi);
-  
   //const totalMatch = output.match(RegKeySeikyuugaku);
 
   //RegExpMatchArray型（配列型またはnull）
     //totalMatchがnullではないと初回で終わってしまうので初期値はnull
-    let totalMatch: RegExpMatchArray | null = null;
+  let totalMatch: RegExpMatchArray | null = null;
     for (const reg of RegKeySeikyuugaku){
       //
       totalMatch =  output.match(reg);
       if (totalMatch) break;
     }
+    console.log(RegKeySeikyuugaku);
   
   //const taxMatch = output.match(/(?: 計 |L_ 1i0%\s*\|)[:：]?\s*¥?\s*([\d,]+)\s*円?/);
   //const taxMatch = output.match(RegKeyTax);
@@ -161,7 +155,18 @@ export async function POST(req: NextRequest) {
       taxMatch = output.match(reg);
       if (taxMatch) break;
     }
+  console.log(RegKeyTax);
 
+    //日付
+  //const dayMatch =output.match(RegKeyShiharaibi);
+  let dayMatch:RegExpMatchArray | null = null;
+    for (const reg of RegKeyShiharaibi){
+      //
+      dayMatch = output.match(reg);
+      if (dayMatch) break;
+    }
+  console.log(RegKeyShiharaibi);
+  
   const extracted = {
     total: totalMatch?.[1] ?? "未検出",
     tax: taxMatch?.[1] ?? "未検出",

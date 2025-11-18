@@ -134,13 +134,20 @@ export async function extractStringData(text: string): Promise<StringData> {
       result.tax = (Number(amount) / 10).toLocaleString();
     }
     
-    // 項目抽出
+
     // 支払い日
 
-    const dayMatch =
-     text.match(RegKeyShiharaibi);
+    //const dayMatch =
+    // text.match(RegKeyShiharaibi);
+    let dayMatch:RegExpMatchArray | null = null;
+    for (const reg of RegKeyShiharaibi){
+      dayMatch = text.match(reg);
+      if (dayMatch) break;
+    }
      console.log(`西暦月日 ${dayMatch}`)
      result.day = dayMatch?.[0] ?? "";
+
+   // 項目抽出
     //const itemRegex = /(\S+)\s+¥?([\d,]+)\s*円?/g;
     //const itemRegex = RegKeyHinmoku;
     for (const reg of RegKeyHinmoku){
