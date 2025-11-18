@@ -15,34 +15,37 @@ import { prisma } from "@/lib/db";
       select: { item: true, keywords: true },
     });
 
-      //正規表現の初期値
-      let KeySeikyuugaku = "";
-      let KeyCompany = "";
-      let KeyHinmoku = "";
-      let KeyTax = "";
-      let KeyShiharaibi = "";
-      let KeyJogai = "";
+  //正規表現の初期値　
+      // 配列にする
+      let KeySeikyuugaku: string[] = [] ;
+      let KeyCompany: string[] = [];
+      let KeyHinmoku: string[] = [];
+      let KeyTax: string[] = [];
+      let KeyShiharaibi: string[] = [];
+      let KeyJogai: string[] = [];
 
      //settings配列をループして該当する
       for (const row of settings){
+        //正規表現を”|||”で区切り配列にいれ、空白を取り除く
+        const regs = row.keywords.split("|||").map(r => r.trim()).filter(Boolean);
         switch(row.item){
           case "請求金額":
-            KeySeikyuugaku= row.keywords;
+            KeySeikyuugaku= regs;
             break;
           case "会社名":
-            KeyCompany= row.keywords;
+            KeyCompany= regs;
             break;
           case "品目":
-            KeyHinmoku= row.keywords;
+            KeyHinmoku= regs;
             break;
           case "消費税":
-            KeyTax= row.keywords;
+            KeyTax= regs;
             break;
           case "支払日":
-            KeyShiharaibi= row.keywords;
+            KeyShiharaibi= regs;
             break;
           case "除外":
-            KeyJogai= row.keywords;
+            KeyJogai= regs;
             break;
           default:
           //上記以外
@@ -74,13 +77,15 @@ export async function POST(req: NextRequest) {
       //支払日:KeyShiharaibi
       //除外:KeyJogai
       
-      //正規表現（RegExp）型に変換
-      const RegKeySeikyuugaku = new RegExp(KeySeikyuugaku);
-      const RegKeyCompany = new RegExp(KeyCompany);
-      const RegKeyHinmoku = new RegExp(KeyHinmoku);
-      const RegKeyTax = new RegExp(KeyTax);
-      const RegKeyShiharaibi = new RegExp(KeyShiharaibi);
-      const RegKeyJogai = new RegExp(KeyJogai);
+       //正規表現（RegExp）型に変換
+    // 配列にする
+    //rは文字列、”g”は全文検索フラグ
+    const RegKeySeikyuugaku = KeySeikyuugaku.map(r => new RegExp(r,"g"));
+    const RegKeyCompany = KeyCompany.map(r => new RegExp(r,"g"));
+    const RegKeyHinmoku = KeyHinmoku.map(r => new RegExp(r,"g"));
+    const RegKeyTax = KeyTax.map(r => new RegExp(r,"g"));
+    const RegKeyShiharaibi = KeyShiharaibi.map(r => new RegExp(r,"g"));
+    const RegKeyJogai = KeyJogai.map(r => new RegExp(r,"g"));
     
   {/* 山下追加終わり　*/}
 
@@ -127,17 +132,41 @@ export async function POST(req: NextRequest) {
   // 🔍 OCR全文をターミナルに出力
   console.log("🧠 OCR結果全文:\n" + (output.trim() || "(空の結果)"));
 
+
+  //
   //const totalMatch = output.match(/(?: 計 |L_ 1i0%\s*\|)[:：]?\s*¥?\s*([\d,]+)\s*円?/);
-  const totalMatch = output.match(RegKeySeikyuugaku);
-  console.log(RegKeySeikyuugaku);
+  //const totalMatch = output.match(RegKeySeikyuugaku);
+
+  //RegExpMatchArray型（配列型またはnull）
+    //totalMatchがnullではないと初回で終わってしまうので初期値はnull
+  let totalMatch: RegExpMatchArray | null = null;
+    for (const reg of RegKeySeikyuugaku){
+      //
+      totalMatch =  output.match(reg);
+      if (totalMatch) break;
+    }
+    console.log(RegKeySeikyuugaku);
+  
   //const taxMatch = output.match(/(?: 計 |L_ 1i0%\s*\|)[:：]?\s*¥?\s*([\d,]+)\s*円?/);
-  const taxMatch = output.match(RegKeyTax);
+  //const taxMatch = output.match(RegKeyTax);
+  let taxMatch: RegExpMatchArray | null = null;
+    for (const reg of RegKeyTax){
+      //
+      taxMatch = output.match(reg);
+      if (taxMatch) break;
+    }
   console.log(RegKeyTax);
-  //日付
-  const dayMatch =output.match(RegKeyShiharaibi);
+
+    //日付
+  //const dayMatch =output.match(RegKeyShiharaibi);
+  let dayMatch:RegExpMatchArray | null = null;
+    for (const reg of RegKeyShiharaibi){
+      //
+      dayMatch = output.match(reg);
+      if (dayMatch) break;
+    }
   console.log(RegKeyShiharaibi);
   
-
   const extracted = {
     total: totalMatch?.[1] ?? "未検出",
     tax: taxMatch?.[1] ?? "未検出",
