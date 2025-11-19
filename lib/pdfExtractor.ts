@@ -86,12 +86,12 @@ export async function extractStringData(text: string): Promise<StringData> {
     //正規表現（RegExp）型に変換
     // 配列にする
     //rは文字列、”g”は全文検索フラグ
-    const RegKeySeikyuugaku = KeySeikyuugaku.map(r => new RegExp(r,"g"));
-    const RegKeyCompany = KeyCompany.map(r => new RegExp(r,"g"));
-    const RegKeyHinmoku = KeyHinmoku.map(r => new RegExp(r,"g"));
-    const RegKeyTax = KeyTax.map(r => new RegExp(r,"g"));
-    const RegKeyShiharaibi = KeyShiharaibi.map(r => new RegExp(r,"g"));
-    const RegKeyJogai = KeyJogai.map(r => new RegExp(r,"g"));
+    const RegKeySeikyuugaku = KeySeikyuugaku.map(r => new RegExp(r,""));
+    const RegKeyCompany = KeyCompany.map(r => new RegExp(r,""));
+    const RegKeyHinmoku = KeyHinmoku.map(r => new RegExp(r,""));
+    const RegKeyTax = KeyTax.map(r => new RegExp(r,""));
+    const RegKeyShiharaibi = KeyShiharaibi.map(r => new RegExp(r,""));
+    const RegKeyJogai = KeyJogai.map(r => new RegExp(r,""));
     
     {/* 山下追加終わり　*/}
 
@@ -112,11 +112,11 @@ export async function extractStringData(text: string): Promise<StringData> {
       //text.match(RegKeySeikyuugaku);
       //console.log(`請求金額 ${totalMatch}`)
      //if (totalMatch) result.total = result.total = (Number(totalMatch[2].replace(/,/g, "")) * 1.1).toLocaleString();
-     if (totalMatch) {
+     if (totalMatch?.[2]) {
       const amount = totalMatch[2].replace(/,/g, "");
       result.total = (Number(amount) * 1.1).toLocaleString();
      }
-
+     console.log(totalMatch);
     // 消費税
     //const taxMatch =
       //text.match(/(消費税額|税抜金額|各合計|項|8%対象\(軽減税率対象\)|10％対象|1   ヶ月|株式会社|本体金額計  ¥0)[:：]?\s*¥?([\d,]+)\s*円?/);
@@ -126,10 +126,11 @@ export async function extractStringData(text: string): Promise<StringData> {
       taxMatch = text.match(reg);
       if (taxMatch) break;
     }
+    console.log(taxMatch);
       //text.match(RegKeyTax);
       //console.log(`消費税 ${taxMatch}`)
     //if (taxMatch) result.tax = (Number(taxMatch[2].replace(/,/g, "")) / 10).toLocaleString();
-    if (taxMatch) {
+    if (taxMatch?.[2]) {
       const amount = taxMatch[2].replace(/,/g, "");
       result.tax = (Number(amount) / 10).toLocaleString();
     }

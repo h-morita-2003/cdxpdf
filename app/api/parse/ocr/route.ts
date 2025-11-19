@@ -80,12 +80,12 @@ export async function POST(req: NextRequest) {
        //正規表現（RegExp）型に変換
     // 配列にする
     //rは文字列、”g”は全文検索フラグ
-    const RegKeySeikyuugaku = KeySeikyuugaku.map(r => new RegExp(r,"g"));
-    const RegKeyCompany = KeyCompany.map(r => new RegExp(r,"g"));
-    const RegKeyHinmoku = KeyHinmoku.map(r => new RegExp(r,"g"));
-    const RegKeyTax = KeyTax.map(r => new RegExp(r,"g"));
-    const RegKeyShiharaibi = KeyShiharaibi.map(r => new RegExp(r,"g"));
-    const RegKeyJogai = KeyJogai.map(r => new RegExp(r,"g"));
+    const RegKeySeikyuugaku = KeySeikyuugaku.map(r => new RegExp(r,""));
+    const RegKeyCompany = KeyCompany.map(r => new RegExp(r,""));
+    const RegKeyHinmoku = KeyHinmoku.map(r => new RegExp(r,""));
+    const RegKeyTax = KeyTax.map(r => new RegExp(r,""));
+    const RegKeyShiharaibi = KeyShiharaibi.map(r => new RegExp(r,""));
+    const RegKeyJogai = KeyJogai.map(r => new RegExp(r,""));
     
   {/* 山下追加終わり　*/}
 
@@ -143,19 +143,22 @@ export async function POST(req: NextRequest) {
     for (const reg of RegKeySeikyuugaku){
       //
       totalMatch =  output.match(reg);
+      console.log(reg);
       if (totalMatch) break;
     }
     console.log(RegKeySeikyuugaku);
-  
+    console.log(totalMatch);
   //const taxMatch = output.match(/(?: 計 |L_ 1i0%\s*\|)[:：]?\s*¥?\s*([\d,]+)\s*円?/);
   //const taxMatch = output.match(RegKeyTax);
   let taxMatch: RegExpMatchArray | null = null;
     for (const reg of RegKeyTax){
       //
       taxMatch = output.match(reg);
+      console.log(reg);
       if (taxMatch) break;
     }
   console.log(RegKeyTax);
+  console.log(taxMatch);
 
     //日付
   //const dayMatch =output.match(RegKeyShiharaibi);
@@ -163,17 +166,18 @@ export async function POST(req: NextRequest) {
     for (const reg of RegKeyShiharaibi){
       //
       dayMatch = output.match(reg);
+      console.log(reg);
       if (dayMatch) break;
     }
   console.log(RegKeyShiharaibi);
-  
+  console.log(dayMatch);
   const extracted = {
     total: totalMatch?.[1] ?? "未検出",
     tax: taxMatch?.[1] ?? "未検出",
     day: dayMatch?.[0] ?? "未検出",
   };
- if (totalMatch) extracted.total = Math.round(Number(totalMatch[1].replace(/,/g, "")) * 1.1).toLocaleString();
- if (taxMatch) extracted.tax = (Number(taxMatch[1].replace(/,/g, "")) / 10).toLocaleString();
+ if (totalMatch?.[1]) {extracted.total = Math.round(Number(totalMatch[1].replace(/,/g, "")) * 1.1).toLocaleString();}
+ if (taxMatch?.[1]) {extracted.tax = (Number(taxMatch[1].replace(/,/g, "")) / 10).toLocaleString();}
 
 console.log("💰 抽出結果:", extracted);
 
