@@ -27,8 +27,8 @@ export default function Home() {
   const handleFile = ( file: File | null) => {
     if (!file) return;
 
-    if (file.type !== "application/pdf") {
-      alert("PDFファイルを選択してください");
+    if (file.type !== "application/pdf" && file.type !== "image/png") {
+      alert("ファイルを選択してください");
       return;
     }
 
@@ -63,7 +63,7 @@ export default function Home() {
 
     //if (!fileInput.files?.[0]) {
     if (!file) {
-      alert("PDFファイルを選択してください");
+      alert("ファイルを選択してください");
       return;
     }
 
@@ -106,6 +106,7 @@ export default function Home() {
       let apiMethod = "POST";
       setJudementText(false);
       setJudementImage(false);
+      //if (file.type !== "application/pdf"){
       if (wordCount > 0) {
         console.log("✅ テキストPDF → /api/parse に送信");
         apiUrl = "/api/parse";
@@ -117,7 +118,9 @@ export default function Home() {
         apiMethod = "POST"; // ← 'ocr_POST' ではなく 'POST'
         setJudementImage(true);
       }
-
+      //}else{
+        //ここでpng用routeと色々連携させる
+      //}
       const res = await fetch(apiUrl, {
         method: apiMethod,
         body: formData,
@@ -196,7 +199,7 @@ export default function Home() {
               }}
             >
               {/* ✅ name="file" をつけるのも大事 */}
-              <input type="file" name="file" accept="application/pdf" 
+              <input type="file" name="file" accept="application/pdf, image/png" 
               //山下追加
                onChange={(e) => handleFile(e.target.files?.[0] ?? null)}
               //山下追加終わり 
