@@ -117,12 +117,12 @@ export async function POST(req: NextRequest) {
   };
 
   if (totalMatch?.[1]) {
-    extracted.total = Math.round(Number(totalMatch[1].replace(/,/g, "")) * 1.1)
+    extracted.total = Math.round(Number(totalMatch[1].replace(/,/g, "")))
       .toLocaleString();
   }
   if (taxMatch?.[1]) {
     extracted.tax = (
-      Number(taxMatch[1].replace(/,/g, "")) / 10
+      Number(taxMatch[1].replace(/,/g, ""))
     ).toLocaleString();
   }
 
