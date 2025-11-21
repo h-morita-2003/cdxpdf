@@ -91,6 +91,7 @@ export default function Home() {
       //山下削除終わり
 
       // ▼ まずPDFからテキストを抽出して単語数を判定
+      
       const wordCountRes = await fetch("/api/parse/wordcount/count/count", {
         method: "POST",
         body: formData,
@@ -106,6 +107,7 @@ export default function Home() {
       let apiMethod = "POST";
       setJudementText(false);
       setJudementImage(false);
+      //if(file.type !== "application/pdf"){
       if (wordCount > 0) {
         console.log("✅ テキストPDF → /api/parse に送信");
         apiUrl = "/api/parse";
@@ -117,7 +119,10 @@ export default function Home() {
         apiMethod = "POST"; // ← 'ocr_POST' ではなく 'POST'
         setJudementImage(true);
       }
-     
+    // }else{ 
+     //apiUrl = "/api/parse/receiptOcr/receipt";
+     //apiMethod = "POST"; //
+     //}
       const res = await fetch(apiUrl, {
         method: apiMethod,
         body: formData,
