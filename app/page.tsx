@@ -17,7 +17,7 @@ export default function Home() {
   const [loading, setLoading] = useState(false);
   const [judgementText, setJudementText] = useState(false);
   const [judgementImage, setJudementImage] = useState(false);
-
+  const [judgementreceipt, setJudementreceipt] = useState(false);
   //山下追加
   const [droppedFile, setDroppedFile] = useState<File | null>(null); 
   const [fileName, setFileName] = useState("");
@@ -108,7 +108,7 @@ export default function Home() {
 
       setJudementText(false);
       setJudementImage(false);
-      
+      setJudementreceipt(false);
       if (wordCount > 0) {
         console.log("✅ テキストPDF → /api/parse に送信");
         apiUrl = "/api/parse";
@@ -123,6 +123,7 @@ export default function Home() {
      }else{ 
      apiUrl = "/api/parse/receiptOcr/receipt";
      apiMethod = "POST"; //
+     setJudementreceipt(true);
      }
       const res = await fetch(apiUrl, {
         method: apiMethod,
@@ -224,6 +225,7 @@ export default function Home() {
           <h2>抽出結果</h2>
           {judgementText &&<h3>このPDFはテキスト型です✐</h3>}
           {judgementImage &&<h3>このPDFは画像型です🖼</h3>}
+          {judgementreceipt &&<h3>これはレシートです📋</h3>}
           <p>📌 請求金額（税込）: {result.total ?? "未検出"}</p>
           {result.total && result.tax && (
           <p>📌 本体価格（税抜）:{" "}
