@@ -27,7 +27,7 @@ export default function Home() {
   const handleFile = ( file: File | null) => {
     if (!file) return;
 
-    if (file.type !== "application/pdf") {
+    if (file.type !== "application/pdf" && file.type !== "image/png") {
       alert("ファイルを選択してください");
       return;
     }
@@ -196,7 +196,7 @@ export default function Home() {
               }}
             >
               {/* ✅ name="file" をつけるのも大事 */}
-              <input type="file" name="file" accept="application/pdf" 
+              <input type="file" name="file" accept="application/pdf, image/png" 
               //山下追加
                onChange={(e) => handleFile(e.target.files?.[0] ?? null)}
               //山下追加終わり 
