@@ -70,7 +70,7 @@ export default function SettingPage(){
                 break;
               case "除外":
                 SetJogai(s.keywords ?? "");
-              break;
+                break;
               default:
                 //上記以外
                 console.error("設定取得項目エラー", s.item);
@@ -139,19 +139,19 @@ export default function SettingPage(){
         <div className="p-6">
             <h1 className="text-xl mb-4">設定画面</h1>
             {/*入力*/}
-            <h1>請求金額（必須）</h1>
+            <h1>請求金額／合計金額（必須）</h1>
             <input
               type = "text"
-              placeholder = "請求金額"
+              placeholder = "請求金額／合計金額"
               value = {seikyuuGaku}
               //onChange = {(e) => SetSeikyuuGaku(Number(e.target.value))}
               onChange = {(e) => SetSeikyuuGaku(e.target.value)}
               className = "border p-2 mb-2 block w-4/5"
             />
-            <h1>会社名（必須）</h1>
+            <h1>会社名／店舗名（必須）</h1>
             <input
               type = "text"
-              placeholder = "会社名"
+              placeholder = "会社名／店舗名"
               value = {company}
               onChange = {(e) => SetCompany(e.target.value)}
               className = "border p-2 mb-2 block w-4/5"
@@ -180,10 +180,10 @@ export default function SettingPage(){
               onChange = {(e) => SetShiharaibi(e.target.value)}
               className = "border p-2 mb-2 block w-4/5"
             />
-            <h1>除外したい会社（必須）</h1>
+            <h1>除外したい会社／店舗名（必須）</h1>
             <input
               type="text"
-              placeholder="除外"
+              placeholder="除外したい会社／店舗名"
               value = {jogai}
               onChange = {(e) => SetJogai(e.target.value)}
               className = "border p-2 mb-2 block w-4/5"
