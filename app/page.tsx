@@ -169,16 +169,7 @@ export default function Home() {
 
     {/*PDF読み込みエラーの設定*/}
     try {
-      //山下削除
-      //fileの取得方法が違うので上記のconst fileで設定
-      //
-      //const input = e.currentTarget.querySelector("input[type=file]") as HTMLInputElement;
-      //if (!input.files?.[0]) return alert("PDFを選択してください");
 
-      //const file = input.files[0];
-      //const formData = new FormData();
-      //formData.append("file", file);
-      //山下削除終わり
 
       // ▼ まずPDFからテキストを抽出して単語数を判定
       let apiUrl = "";
