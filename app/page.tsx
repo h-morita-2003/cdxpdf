@@ -258,6 +258,7 @@ export default function Home() {
       
       
       {/*PDFファイル入力*/}    
+
       <h1>本サイトにPDFを選択、またはドラッグ＆ドロップ</h1>
       
       {/* 📷 カメラボタン */}
@@ -295,6 +296,9 @@ export default function Home() {
           )}
         </div>
       )}
+
+      <h1>本サイトにPDFまたはpngを選択、またはドラッグ＆ドロップ</h1>
+
       <center>
         <form onSubmit={handleUpload}>
           <div
@@ -309,7 +313,7 @@ export default function Home() {
               background: "#fafafa",
             }}
           >
-            <div id="dropArea">↓ここにPDFをドラッグ＆ドロップ
+            <div id="dropArea">↓ここにPDF/pngをドラッグ＆ドロップ
               {/*山下追加*/}
               <br />
                {/*選択またはドラッグアンドドロップされたファイル名表示* */}
