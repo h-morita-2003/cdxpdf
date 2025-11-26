@@ -1,5 +1,5 @@
 "use client";
-import { Children, useState,DragEvent,useCallback } from "react";
+import { Children, useState,DragEvent,useCallback,useRef, useEffect,  } from "react";
 import Link from "next/link";
 
 {/*山下追加
@@ -21,7 +21,97 @@ export default function Home() {
   //山下追加
   const [droppedFile, setDroppedFile] = useState<File | null>(null); 
   const [fileName, setFileName] = useState("");
+    // 📷 カメラ用
+  const [cameraOpen, setCameraOpen] = useState(false);
+  const [photo, setPhoto] = useState<string | null>(null);
+  const [ocrFromCamera, setOcrFromCamera] = useState("");
 
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const [stream, setStream] = useState<MediaStream | null>(null);
+
+  // ================================
+  // 📷 カメラ起動
+  // ================================
+  const startCamera = async () => {
+    setCameraOpen(true);
+
+    const stream = await navigator.mediaDevices.getUserMedia({
+      video: true,
+      audio: false,
+    });
+
+    if (videoRef.current) {
+       videoRef.current.srcObject = stream;
+      videoRef.current.play();
+    }
+  };
+  const stopCamera = () => {
+    if (stream) {
+      stream.getTracks().forEach((track) => track.stop());
+    }
+    setStream(null);
+    setCameraOpen(false);
+  };
+
+  // ================================
+  // 📷 撮影 → Base64 作成
+  // ================================
+  const takePhoto = () => {
+  const video = videoRef.current;
+  const canvas = canvasRef.current;
+  if (!video || !canvas) return;
+
+  canvas.width = video.videoWidth;
+  canvas.height = video.videoHeight;
+
+  const ctx = canvas.getContext("2d");
+  ctx?.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+  const img = canvas.toDataURL("image/png");
+  setPhoto(img);
+
+  // ================================
+  // Base64 → Blob → File
+  // ================================
+  fetch(img)
+    .then((res) => res.blob())
+    .then((blob) => {
+      const file = new File([blob], `camera_receipt_${Date.now()}.png`, {
+        type: "image/png",
+      });
+      
+      // ★ 撮影画像を既存の処理に流す
+      handleFile(file);
+
+      // ★ 既存の form submit に回したい場合はここで自動送信もできる：
+      // document.querySelector("form")?.dispatchEvent(new Event("submit"));
+    });
+
+  // ★撮影と同時にカメラ専用OCRを動かしたいならここに残す
+  sendToCameraOCR(img);
+};
+  // ================================
+  // 📨 カメラ画像を OCR API に送信
+  // ================================
+  const sendToCameraOCR = async (imageBase64: string) => {
+    setLoading(true);
+
+    const res = await fetch("/api/ocr-camera", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ image: imageBase64 }),
+    });
+
+    const data = await res.json();
+
+    // runOCR.js の全文が返るのでそのまま表示
+    setOcrFromCamera(data.text);
+    setResult({ raw: data.text });
+
+    setJudementreceipt(true);
+    setLoading(false);
+  };
 
   // どちら（input or D&D）からでも同じ処理を使う
   const handleFile = ( file: File | null) => {
@@ -169,6 +259,42 @@ export default function Home() {
       
       {/*PDFファイル入力*/}    
       <h1>本サイトにPDFを選択、またはドラッグ＆ドロップ</h1>
+      
+      {/* 📷 カメラボタン */}
+      <button
+        onClick={startCamera}
+        style={{ background: "#000000ff", color: "#fff", padding: "10px" }}
+      >
+        📷 カメラでレシート撮影（OCR）
+      </button>
+      {/* 📷 カメラビュー */}
+      {cameraOpen && (
+        <div style={{ marginTop: 20 }}>
+          <video ref={videoRef} autoPlay playsInline style={{ width: 300 }} />
+          <br />
+         <button onClick={takePhoto} style={{ marginTop: 10 ,background: "#020202ff", color: "#fff", padding: "10px" }}>
+            📸 撮影して OCR
+          </button>
+            
+           <button onClick={stopCamera} style={{ marginLeft: "10px" ,background: "#fc0000ff", color: "#ffffffff", padding: "10px" }}>
+              ■ カメラ停止
+            </button>
+          <canvas ref={canvasRef} style={{ display: "none" }} />
+
+          {photo && (
+            <div>
+              <h3>撮影画像</h3>
+              <img src={photo} style={{ width: 300 }} />
+            </div>
+          )}
+
+          {ocrFromCamera && (
+            <pre style={{ whiteSpace: "pre-wrap", marginTop: 20 }}>
+              {ocrFromCamera}
+            </pre>
+          )}
+        </div>
+      )}
       <center>
         <form onSubmit={handleUpload}>
           <div
