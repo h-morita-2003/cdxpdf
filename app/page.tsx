@@ -84,8 +84,8 @@ export default function Home() {
       // ★ 撮影画像を既存の処理に流す
       handleFile(file);
 
-      // ★ 既存の form submit に回したい場合はここで自動送信もできる：
-      // document.querySelector("form")?.dispatchEvent(new Event("submit"));
+      
+      
     });
 
   // ★撮影と同時にカメラ専用OCRを動かしたいならここに残す
