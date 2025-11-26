@@ -259,7 +259,7 @@ export default function Home() {
       
       {/*PDFファイル入力*/}    
 
-      <h1>本サイトにPDFを選択、またはドラッグ＆ドロップ</h1>
+      <h1>本サイトにPDFまたはpngを選択、またはドラッグ＆ドロップ</h1>
       
       {/* 📷 カメラボタン */}
       <button
@@ -297,7 +297,7 @@ export default function Home() {
         </div>
       )}
 
-      <h1>本サイトにPDFまたはpngを選択、またはドラッグ＆ドロップ</h1>
+      
 
       <center>
         <form onSubmit={handleUpload}>
