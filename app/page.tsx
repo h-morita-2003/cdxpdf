@@ -1,7 +1,8 @@
 "use client";
 import { Children, useState,DragEvent,useCallback,useRef, useEffect,  } from "react";
 import Link from "next/link";
-
+import { rectifyReceipt } from "@/utils/rectifyReceipt";
+import Script from "next/script";
 {/*山下追加
   設定項目*/}
 type Setting = {
@@ -11,8 +12,21 @@ type Setting = {
 {/*山下追加終わり*/}
 
 
-export default function Home() {
+export default function Home({ children }: { children: React.ReactNode }) {
   {/*ステート管理（現在、関数）＝usestate（初期値）*/}
+  //台形補正の為のOpencv用のUseEfect追加
+  const [cvReady, setCvReady] = useState(false);
+
+  useEffect(() => {
+  const script = document.createElement("script");
+  script.src = "/opencv.js";
+  script.async = true;
+  script.onload = () => {
+    console.log("✅ OpenCV.js 読み込み完了");
+    setCvReady(true);
+  };
+  document.body.appendChild(script);
+}, []);
   const [result, setResult] = useState<any>(null);
   const [loading, setLoading] = useState(false);
   const [judgementText, setJudementText] = useState(false);
@@ -55,9 +69,14 @@ export default function Home() {
   };
 
   // ================================
-  // 📷 撮影 → Base64 作成
+  // 📷 撮影 → 台形補正 → Base64 作成
   // ================================
-  const takePhoto = () => {
+ const takePhoto = () => {
+  if (!cvReady) {
+    alert("OpenCV.jsを読み込み中です。1〜2秒後に再実行してください。");
+    return;
+  }
+
   const video = videoRef.current;
   const canvas = canvasRef.current;
   if (!video || !canvas) return;
@@ -68,29 +87,25 @@ export default function Home() {
   const ctx = canvas.getContext("2d");
   ctx?.drawImage(video, 0, 0, canvas.width, canvas.height);
 
-  const img = canvas.toDataURL("image/png");
-  setPhoto(img);
+  // ⭐ 台形補正
+  const corrected = rectifyReceipt(canvas);
 
-  // ================================
-  // Base64 → Blob → File
-  // ================================
-  fetch(img)
-    .then((res) => res.blob())
-    .then((blob) => {
-      const file = new File([blob], `camera_receipt_${Date.now()}.png`, {
-        type: "image/png",
-      });
-      
-      // ★ 撮影画像を既存の処理に流す
+  // ⭐ 補正後の画像を画面に表示
+  const base64 = corrected ?? canvas.toDataURL("image/png");
+  setPhoto(base64);
+
+  // ⭐ File 化する
+  fetch(base64)
+    .then(res => res.blob())
+    .then(blob => {
+      const file = new File([blob], `camera_receipt_${Date.now()}.png`, { type: "image/png" });
       handleFile(file);
-
-      
-      
     });
 
-  // ★撮影と同時にカメラ専用OCRを動かしたいならここに残す
-  sendToCameraOCR(img);
+  // ⭐ OCR に送信
+  sendToCameraOCR(base64);
 };
+
   // ================================
   // 📨 カメラ画像を OCR API に送信
   // ================================
@@ -234,6 +249,10 @@ export default function Home() {
 {/*画面１*/}
 {/*ファイルをドラッグ＆ドロップ*/}
   return (
+     <>
+    {/* 🔥 OpenCV.js 読み込み */}
+    
+
     <div>
 
       {/*山下追加*/}
@@ -271,7 +290,7 @@ export default function Home() {
            <button onClick={stopCamera} style={{ marginLeft: "10px" ,background: "#fc0000ff", color: "#ffffffff", padding: "10px" }}>
               ■ カメラ停止
             </button>
-          <canvas ref={canvasRef} style={{ display: "none" }} />
+          <canvas ref={canvasRef} style={{ width: 300, display: "block", marginTop: 20 }} />
 
           {photo && (
             <div>
@@ -414,6 +433,7 @@ export default function Home() {
   </div>
 )}
     </div>
+    </>
   );
 
 }
