@@ -7,7 +7,7 @@ import { prisma } from "@/lib/db";
 //設定を上書き保存
 export async function POST(req:Request){
     try{
-      console.log("aaa");
+      //console.log("aaa");
       const data = await req.json();
 
       //データをDBに上書き保存
