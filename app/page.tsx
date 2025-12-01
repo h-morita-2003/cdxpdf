@@ -39,7 +39,26 @@ export default function Home({ children }: { children: React.ReactNode }) {
   const [cameraOpen, setCameraOpen] = useState(false);
   const [photo, setPhoto] = useState<string | null>(null);
   const [ocrFromCamera, setOcrFromCamera] = useState("");
+   const base64ToFile = (base64: string, filename: string) => {
+  let mime = "image/png"; // デフォルト
 
+  // dataURL 形式なら mime を抽出
+  const headerMatch = base64.match(/^data:(.*?);base64,/);
+  if (headerMatch) {
+    mime = headerMatch[1];
+    base64 = base64.replace(/^data:.*;base64,/, "");
+  }
+
+  const bstr = atob(base64);
+  let n = bstr.length;
+  const u8arr = new Uint8Array(n);
+
+  while (n--) {
+    u8arr[n] = bstr.charCodeAt(n);
+  }
+
+  return new File([u8arr], filename, { type: mime });
+};
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [stream, setStream] = useState<MediaStream | null>(null);
@@ -95,12 +114,8 @@ export default function Home({ children }: { children: React.ReactNode }) {
   setPhoto(base64);
 
   // ⭐ File 化する
-  fetch(base64)
-    .then(res => res.blob())
-    .then(blob => {
-      const file = new File([blob], `camera_receipt_${Date.now()}.png`, { type: "image/png" });
-      handleFile(file);
-    });
+  const file = base64ToFile(base64, `camera_receipt_${Date.now()}.png`);
+  handleFile(file);
 
   // ⭐ OCR に送信
   sendToCameraOCR(base64);
@@ -291,7 +306,12 @@ export default function Home({ children }: { children: React.ReactNode }) {
               ■ カメラ停止
             </button>
           <canvas ref={canvasRef} style={{ width: 300, display: "block", marginTop: 20 }} />
-
+          <canvas
+          id="outputCanvas"
+          width={300}
+          height={600}
+          style={{ width: 300, display: "block", marginTop: 20, border: "1px solid #ccc" }}
+          ></canvas>
           {photo && (
             <div>
               <h3>撮影画像</h3>

@@ -21,6 +21,7 @@ export async function getSettingKeywords() {
 
     for (const row of settings) {
       const regs = row.keywords.split("|||").map(r => r.trim()).filter(Boolean);
+
       switch (row.item) {
         case "請求金額": KeySeikyuugaku = regs; break;
         case "会社名": KeyCompany = regs; break;
@@ -32,13 +33,14 @@ export async function getSettingKeywords() {
           console.error("正規表現取得項目エラー", row.item);
       }
     }
+
     return { KeySeikyuugaku, KeyCompany, KeyHinmoku, KeyTax, KeyShiharaibi, KeyJogai };
   } catch (error) {
     console.error("正規表現取得エラー:", error);
     throw error;
   }
 }
-/* 山下追加終わり */
+/* 山下追加 終わり */
 
 
 export async function POST(req: NextRequest) {
@@ -55,20 +57,28 @@ export async function POST(req: NextRequest) {
   const RegKeyShiharaibi = KeyShiharaibi.map(r => new RegExp(r, ""));
   const RegKeyJogai = KeyJogai.map(r => new RegExp(r, ""));
 
-  // ここから変換削除版 ------------------------
+  // ここから PNG 直接 OCR ------------------------
 
   const formData = await req.formData();
   const file = formData.get("file") as File;
+
+  if (!file) {
+    return NextResponse.json({ ok: false, error: "ファイルがありません" });
+  }
+
   const arrayBuffer = await file.arrayBuffer();
 
-  // 元コードでは PDF → PNG があったが削除
-  // その代わり file を直接 OCR に渡す
-  const tmpPath = path.join(process.cwd(), "upload_input");
+  // 🚨 ここが最重要：PNG破損防止の正しいバイト変換
+  const buffer = Buffer.from(new Uint8Array(arrayBuffer));
 
-  await fs.promises.writeFile(tmpPath, Buffer.from(arrayBuffer));
+  // 保存パスは .png を必ず付ける（Tesseract が判別できるように）
+  const tmpPath = path.join(process.cwd(), "upload_input.png");
 
-  console.log("🔍 OCR処理中...");
+  await fs.promises.writeFile(tmpPath, buffer);
 
+  console.log("🔍 OCR処理中...", tmpPath);
+
+  // runOCR.js を呼び出す
   const ocrScript = path.resolve(process.cwd(), "server", "runOCR.js");
   const proc = spawn("node", [ocrScript, tmpPath]);
 
@@ -85,13 +95,17 @@ export async function POST(req: NextRequest) {
 
   await new Promise((resolve) => proc.on("close", resolve));
 
-  console.log("✅ OCR完了");
+  console.log("🧠 OCR完了");
 
-  if (errorOutput) console.error("⚠️ OCRエラー:", errorOutput);
+  if (errorOutput) {
+    console.error("⚠️ OCRエラー:", errorOutput);
+  }
 
   console.log("🧠 OCR結果全文:\n" + (output.trim() || "(空の結果)"));
 
-  // 抽出処理
+
+  // ------------------ 抽出処理 ------------------
+
   let totalMatch: RegExpMatchArray | null = null;
   for (const reg of RegKeySeikyuugaku) {
     totalMatch = output.match(reg);
@@ -115,16 +129,6 @@ export async function POST(req: NextRequest) {
     tax: taxMatch?.[1] ?? "未検出",
     day: dayMatch?.[0] ?? "未検出",
   };
-
-  if (totalMatch?.[1]) {
-    extracted.total = Math.round(Number(totalMatch[1].replace(/,/g, "")))
-      .toLocaleString();
-  }
-  if (taxMatch?.[1]) {
-    extracted.tax = (
-      Number(taxMatch[1].replace(/,/g, ""))
-    ).toLocaleString();
-  }
 
   console.log("💰 抽出結果:", extracted);
 

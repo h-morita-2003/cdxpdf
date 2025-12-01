@@ -2,7 +2,7 @@
 import Tesseract from "tesseract.js";
 import fs from "fs";
 
-const imagePath = process.argv[2]; // route.tsから渡された画像パス
+const imagePath = process.argv[2];
 
 if (!imagePath || !fs.existsSync(imagePath)) {
   console.error("❌ 画像ファイルが見つかりません:", imagePath);
@@ -11,11 +11,14 @@ if (!imagePath || !fs.existsSync(imagePath)) {
 
 console.log("🧠 OCR開始:", imagePath);
 
-Tesseract.recognize(imagePath, "jpn+eng", {
+// 🔥 画像ファイルを Buffer で読み込む（フォーマット判定エラー対策）
+const imageBuffer = fs.readFileSync(imagePath);
+
+Tesseract.recognize(imageBuffer, "jpn+eng", {
   logger: (m) => console.log(m.status, Math.round(m.progress * 100) + "%"),
 })
   .then(({ data: { text } }) => {
-    console.log(text); // ← route.tsがこれを受け取って出力
+    console.log(text);
     process.exit(0);
   })
   .catch((err) => {
