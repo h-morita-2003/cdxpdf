@@ -16,12 +16,6 @@ export default function Home() {
   //const [ocrFromCamera, setOcrFromCamera] = useState("");
   //const [stream, setStream] = useState<MediaStream | null>(null);
 
-
-  // ★撮影と同時にカメラ専用OCRを動かしたいならここに残す
-  //sendToCameraOCR(img);
-
-    
-
     //const fileInput = e.currentTarget.querySelector(
    // const formInput = e.currentTarget.querySelector(
    //   "input[type=file]"
