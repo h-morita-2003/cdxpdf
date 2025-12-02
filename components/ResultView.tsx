@@ -2,20 +2,34 @@
 
 import { Result } from "types/result";
 
+type ResultViewProps = {
+  result :Result | null;
+  //PDFかレシート判定
+    judgementReceipt? : boolean;
+    judgementText? : boolean;
+    judgementImage? : boolean;
+}
 
-export default function ResultView({ result }:{result: Result | null }) {
+
+//export default function ResultView({ result }:{result: Result | null }) {
+export default function ResultView({
+  result,
+  judgementText,
+  judgementImage,
+  judgementReceipt,
+  }: ResultViewProps ){
     if (!result) return null;
 
-    const { isReceipt, isText, isImagePdf } = result;
+    //const { isReceipt, isText, isImagePdf } = result;
     
     return(
         <div style={{ marginTop: "20px" }}>
 
           <h2>抽出結果</h2>
 
-          {isText && <h3>このPDFはテキスト型です✐</h3>}
-          {isImagePdf && <h3>このPDFは画像型です🖼</h3>}
-          {isReceipt && <h3>これはレシートです📋</h3>}
+          {judgementText && <h3>このPDFはテキスト型です✐</h3>}
+          {judgementImage && <h3>このPDFは画像型です🖼</h3>}
+          {judgementReceipt && <h3>これはレシートです📋</h3>}
 
           <p>📌 請求金額（税込）: {result.total ?? "未検出"}</p>
 

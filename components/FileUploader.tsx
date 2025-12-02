@@ -4,26 +4,28 @@ import React from "react";
 import { useFileHandler } from "hooks/useFileHandler";
 
 type FileUpLoaderProps = {
-    onSubmit : (file: File) => void;
+    File : File | null;
+    fileName : string;
+    handleFile : (e:any) => void;
+    handleDrop : (e:any) => void;
+    handleDragOver : (e:any) => void;
+    onExecute: () => void;
 };
 
-export default function FileUpLoader({ onSubmit }:FileUpLoaderProps){
-    const {File,
+//export default function FileUpLoader({ onSubmit }:FileUpLoaderProps){
+export default function FileUpLoader({
+           File,
            fileName,
            handleFile,
            handleDrop,
-           handleDragOver,} =
-        useFileHandler();
+           handleDragOver,
+           onExecute,
+        }: FileUpLoaderProps) {
 
-    const submit = (e:React.FormEvent) => {
-        e.preventDefault();
-        if (!File) 
-            return alert("ファイルを選択してください");
-            onSubmit(File);
-    };
 
+    
     return(
-        <form onSubmit={submit}>
+        //<form onSubmit={submit}>
           <div
             onDrop={handleDrop}
             onDragOver={handleDragOver}
@@ -46,8 +48,11 @@ export default function FileUpLoader({ onSubmit }:FileUpLoaderProps){
               onChange={(e) => handleFile(e.target.files?.[0] ?? null)}
                />
             {/*フォーム送信ボタン*/}
-            <button type="submit">実行</button>
+            <button 
+              type="button"
+              onClick={onExecute}
+            >実行</button>
           </div>
-        </form>
+        //</form>
     )
 }

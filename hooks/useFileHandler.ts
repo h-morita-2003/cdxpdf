@@ -3,6 +3,7 @@ import { useState,DragEvent } from "react";
 export const useFileHandler = () => {
     const [File, setFile] = useState<File | null>(null); 
     const [fileName, setFileName] = useState("");
+    
 
     const handleFile = ( f: File | null) => {
         if (!f) return;
@@ -25,6 +26,8 @@ export const useFileHandler = () => {
     const handleDragOver = (e: DragEvent<HTMLDivElement>) => {
         e.preventDefault();
     };
+
+    
 
     //元page内にあった↓はページリロードを防ぐためのものなのでここでは削除
     //const handleUpload = async (e: React.FormEvent<HTMLFormElement>) => {

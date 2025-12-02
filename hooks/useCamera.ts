@@ -1,25 +1,11 @@
 import {  useState, useRef, useEffect } from "react";
+import { rectifyReceipt } from "@/utils/rectifyReceipt";
 
 // 📷 カメラ用
-export const useCamera = (onPhotoTaken:(file: File)  => void, onCameraOCR: (text: string) => void) => {
+//export const useCamera = (onPhotoTaken:(file: File)  => void, onCameraOCR: (text: string) => void) => {
     //引数1：Fileオブジェクト（名前：file）を受け取り、何も返さない関数onPhotoTaken
     //引数2：Stringオブジェクト（名前：text）を受け取り、何も返さない関数onCameraOCR
-
-   {/*ステート管理（現在、関数）＝usestate（初期値）*/}
-    //台形補正の為のOpencv用のUseEfect追加
-    const [cvReady, setCvReady] = useState(false);
-
-
-    useEffect(() => {
-      const script = document.createElement("script");
-      script.src = "/opencv.js";
-      script.async = true;
-      script.onload = () => {
-        console.log("✅ OpenCV.js 読み込み完了");
-        setCvReady(true);
-      };
-      document.body.appendChild(script);
-    }, []);
+export default function useCamera(){
 
     const [cameraOpen, setCameraOpen] = useState(false);
     const [photo, setPhoto] = useState<string | null>(null);
@@ -49,6 +35,21 @@ export const useCamera = (onPhotoTaken:(file: File)  => void, onCameraOCR: (text
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const [stream, setStream] = useState<MediaStream | null>(null);
 
+    //台形補正の為のOpencv用のUseEfect追加
+    const [cvReady, setCvReady] = useState(false);
+
+    // OpenCV.js 読込
+    useEffect(() => {
+      const script = document.createElement("script");
+      script.src = "/opencv.js";
+      script.async = true;
+      script.onload = () => {
+      console.log("✅ OpenCV.js 読み込み完了");
+      setCvReady(true);
+      };
+      document.body.appendChild(script);
+      }, []);
+
   //
   // ================================
   // 📷 カメラ起動
@@ -60,6 +61,7 @@ export const useCamera = (onPhotoTaken:(file: File)  => void, onCameraOCR: (text
       video: true,
       audio: false,
     });
+    setStream(stream);
 
     if (videoRef.current) {
        videoRef.current.srcObject = stream;
@@ -72,7 +74,7 @@ export const useCamera = (onPhotoTaken:(file: File)  => void, onCameraOCR: (text
     if (stream) {
       stream.getTracks().forEach((track) => track.stop());
     }
-    //setStream(null);
+    setStream(null);
     setCameraOpen(false);
   };
 
@@ -108,40 +110,28 @@ export const useCamera = (onPhotoTaken:(file: File)  => void, onCameraOCR: (text
     const file = base64ToFile(base64, `camera_receipt_${Date.now()}.png`);
     //handleFile(file);
 
-    // ================================
-    // Base64 → Blob → File
-    // ================================
-    //fetch(img)
-    //.then((res) => res.blob())
-    //.then((blob) => {
-      //const file = new File([blob], `camera_receipt_${Date.now()}.png`, {
-      //  type: "image/png",
-      //});
-    //↑thenのネストが多いので変更（処理内容は同じ）
-    //const blob = await fetch(img).then((res) => res.blob());
-    //const file = new File([blob], `camera_receipt_${Date.now()}.png`, {
-    //    type: "image/png",
-    //});
-      
-    //
-    //handleFile(file);
-    onPhotoTaken(file);
+    // ⭐ OCR に送信
+    sendToCameraOCR(base64);
+  
+    };
 
+  // ★撮影と同時にカメラ専用OCRを動かしたいならここに残す
+  //sendToCameraOCR(img); 
   // ================================
   // 📨 カメラ画像を OCR API に送信
   // ================================
-    //const res = await fetch("/api/ocr-camera", {
-    //  method: "POST",
-    //  headers: { "Content-Type": "application/json" },
-    ////  body: JSON.stringify({ image: imageBase64 }),
-    //  body: JSON.stringify({ image: img }),
-    //});
     const sendToCameraOCR = async (imageBase64: string) => {
-    setLoading(true);
 
+      //setLoading(true);
+      const res = await fetch("/api/ocr-camera", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ image: imageBase64 }),
+      });
+  
     const data = await res.json();
-    onCameraOCR(data.text);
-  };
+    setOcrFromCamera(data.text);
+    };
 
   return{
     cameraOpen,
@@ -151,6 +141,7 @@ export const useCamera = (onPhotoTaken:(file: File)  => void, onCameraOCR: (text
     startCamera,
     stopCamera,
     takePhoto,
+    ocrFromCamera
   };
 
 };

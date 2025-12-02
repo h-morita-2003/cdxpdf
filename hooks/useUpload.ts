@@ -3,8 +3,17 @@ import { useState } from "react";
 export const useUpload = () => {
     const [result, setResult] = useState<any>(null);
     const [loading, setLoading] = useState(false);
+    const [judgementText, setJudementText] = useState(false);
+    const [judgementImage, setJudementImage] = useState(false);
+    const [judgementreceipt, setJudementreceipt] = useState(false);
 
     const upLoad = async ( file : File ) => {
+
+        const submit = (e:React.FormEvent) => {
+        e.preventDefault();
+        };
+
+
         setLoading(true);
         // runOCR.js の全文が返るのでそのまま表示
         //setOcrFromCamera(data.text);
@@ -19,12 +28,13 @@ export const useUpload = () => {
         formData.append("file", file);
 
         let apiUrl = "";
-        let isReceipt = false;
-        let isText = false;
-        let isImagePdf = false;
 
         // ▼ まずPDFからテキストを抽出して単語数を判定
         try{
+            setJudementText(false);
+            setJudementImage(false);
+            setJudementreceipt(false);
+            
             if(file.type === "application/pdf"){
                 const wordCountRes = await fetch("/api/parse/wordcount/count/count", {
                     method: "POST",body: formData,
@@ -35,21 +45,20 @@ export const useUpload = () => {
                 console.log("🧩 PDF単語数:", wordCount);
 
                 if (wordCount  > 0){
-                    isText = true;
                     console.log("✅ テキストPDF → /api/parse に送信");
                     apiUrl = "/api/parse";
                     //apiMethod = "POST"; // ← method名は 'pdf_POST' ではなく 'POST'！
+                    setJudementText(true);
                 }else {
-                    isImagePdf = true;
                     console.log("🖼 画像PDF → /api/parse/ocr に送信");
                     apiUrl = "/api/parse/ocr";
                     //apiMethod = "POST"; // ← method名は 'pdf_POST' ではなく 'POST'！
+                    setJudementImage(true);
                 }
             }else{
                 //レシートの場合
-                isReceipt = true;
                 apiUrl = "/api/parse/receiptOcr/receipt";
-                //setJudementreceipt(true);
+                setJudementreceipt(true);
             }
             const res = await fetch(apiUrl, {
             //    method: apiMethod,
@@ -57,14 +66,11 @@ export const useUpload = () => {
                 body: formData,
             });
 
+            if (!res.ok) throw new Error("APIエラー");
+
             const data = await res.json();
             console.log("📜 レスポンス body:", data.result);
-            setResult({
-                ...data.result,
-                isReceipt,
-                isText,
-                isImagePdf,
-            });
+            setResult(data.result);
         } catch (err) {
             console.error("❌ エラー:", err);
             setResult({ error: "処理中にエラーが発生しました" });
@@ -73,5 +79,8 @@ export const useUpload = () => {
         }
     };
 
-    return {upLoad,loading,result,setResult }
+    return {
+        upLoad,loading,result,
+        judgementText,judgementImage,judgementreceipt,
+     }
 };

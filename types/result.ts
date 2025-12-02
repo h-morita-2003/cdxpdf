@@ -4,11 +4,7 @@ export type OCRitem = {
 }
 
 export type Result = {
-    //PDFかレシート判定
-    isReceipt? : boolean;
-    isText? : boolean;
-    isImagePdf? : boolean;
-
+    
     //各項目
     total? : string | null;
     tax? : string | null;
