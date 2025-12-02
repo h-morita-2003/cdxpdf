@@ -41,7 +41,7 @@ export default function CameraArea({ onFile, onOcrText}: CameraAreaProps){
                   ■ カメラ停止
                   </button>
 
-                  <canvas ref={canvasRef} style={{ display: "none" }} />
+                  <canvas ref={canvasRef} style={{ width: 300, display: "block", marginTop: 20 }} />
 
                   {photo && (
                     <div>
