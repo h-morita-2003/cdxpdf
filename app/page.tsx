@@ -6,17 +6,22 @@ import Link from "next/link";
 import { useUpload } from "hooks/useUpload";
 import useCamera from "hooks/useCamera";
 import { useFileHandler } from "hooks/useFileHandler";
+import { useEffect } from "react";
 
 
 
 export default function Home() {
   const { upLoad, loading, result, judgementText,judgementImage,judgementreceipt,} 
   = useUpload();
-  const { cameraOpen, photo,videoRef,canvasRef,startCamera,stopCamera,takePhoto,ocrFromCamera,} 
+  const { cameraOpen, photo,videoRef,canvasRef,startCamera,stopCamera,takePhoto,ocrFromCamera,cameraFile,cameraFileName} 
   = useCamera();
   const {File,fileName,handleFile,handleDrop,handleDragOver,}
   = useFileHandler();
-  
+  useEffect(() =>{
+    if(cameraFile){
+      handleFile(cameraFile);
+    }
+  },[cameraFile]);
    
 {/*画面１*/}
   return (

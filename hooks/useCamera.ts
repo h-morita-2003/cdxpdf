@@ -10,6 +10,8 @@ export default function useCamera(){
     const [cameraOpen, setCameraOpen] = useState(false);
     const [photo, setPhoto] = useState<string | null>(null);
     const [ocrFromCamera, setOcrFromCamera] = useState("");
+    const [cameraFile,setCameraFile]= useState<File | null>(null);
+    const [cameraFileName,setCameraFileName]= useState("");
     const base64ToFile = (base64: string, filename: string) => {
     let mime = "image/png"; // デフォルト
 
@@ -109,7 +111,8 @@ export default function useCamera(){
     // ⭐ File 化する
     const file = base64ToFile(base64, `camera_receipt_${Date.now()}.png`);
     //handleFile(file);
-
+    setCameraFile(file);
+    setCameraFileName(file.name);
     // ⭐ OCR に送信
     sendToCameraOCR(base64);
   
@@ -141,7 +144,9 @@ export default function useCamera(){
     startCamera,
     stopCamera,
     takePhoto,
-    ocrFromCamera
+    ocrFromCamera,
+    cameraFile,
+    cameraFileName
   };
 
 };

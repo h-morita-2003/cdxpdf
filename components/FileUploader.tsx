@@ -55,7 +55,7 @@ export default function FileUpLoader({
                           color: "#ffffffff", 
                           padding: "10px", 
                           width:"6%"}}>
-            <button type="button"onClick={onExecute} >実行</button>
+            <button type="submit"onClick={onExecute} >実行</button>
             </div>
             </center>
           </div>
