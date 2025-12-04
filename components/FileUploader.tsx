@@ -36,6 +36,7 @@ export default function FileUpLoader({
               background: "#fafafa",
             }}
           >
+            
             <p>↓ここにPDF/pngをドラッグ＆ドロップ</p>
                {/*選択またはドラッグアンドドロップされたファイル名表示* */}
                {fileName && 
@@ -48,10 +49,15 @@ export default function FileUpLoader({
               onChange={(e) => handleFile(e.target.files?.[0] ?? null)}
                />
             {/*フォーム送信ボタン*/}
-            <button 
-              type="button"
-              onClick={onExecute}
-            >実行</button>
+            <center>
+            <div style={{ marginLeft: "10px" ,
+                          background: "#00e1ffff" , 
+                          color: "#ffffffff", 
+                          padding: "10px", 
+                          width:"6%"}}>
+            <button type="button"onClick={onExecute} >実行</button>
+            </div>
+            </center>
           </div>
         //</form>
     )
