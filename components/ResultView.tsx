@@ -31,6 +31,8 @@ export default function ResultView({
           {judgementImage && <h3>このPDFは画像型です🖼</h3>}
           {judgementReceipt && <h3>これはレシートです📋</h3>}
 
+          {(judgementText || judgementImage) ? (
+           <>
           <p>📌 請求金額（税込）: {result.total ?? "未検出"}</p>
 
           {result.total && result.tax && (
@@ -71,6 +73,36 @@ export default function ResultView({
         </p>
 
         <p>🏢 発行元会社: {result.companyName ?? "不明"}</p>
+        </> 
+          ):judgementReceipt ?(
+            <>
+            <p>📌 請求金額（税込）: {result.total ?? "未検出"}</p>
+        <h3>📋 項目</h3>
+        <ul>
+          {result.items && result.items.length > 0 ? (
+            result.items.map((item: any, idx: number) => (
+              <li key={idx}>
+                {item.description} : ¥{item.amount}
+              </li>
+            ))
+          ) : (
+            <li>項目なし</li>
+          )}
+        </ul>
+
+        <p>
+          発行日:{result.day ?? "不明"}
+          {result.day && (result.day.includes("年") || result.day.includes("月"))
+            ? "日"
+            : ""}
+        </p>
+
+        <p>🏢 発行元会社: {result.companyName ?? "不明"}</p>
+            </>
+          ):(
+            <>
+            </>
+          )}
       </div>
     );
 }
