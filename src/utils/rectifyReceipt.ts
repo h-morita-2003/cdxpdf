@@ -105,20 +105,38 @@ export const rectifyReceipt = (canvas: HTMLCanvasElement): string | null => {
 
     // ❗ Tesseract 対策 → RGB で出力
     let rgb = new cv.Mat();
-    cv.cvtColor(dst, rgb, cv.COLOR_RGBA2RGB);
 
-    cv.imshow("outputCanvas", rgb);
+    //Tesseract最適化
+    //グレースケール化
+    let ocrGray = new cv.Mat();
+    cv.cvtColor(rgb, ocrGray , cv.COLOR_RGBA2GRAY);
+    //ノイズ除去
+    let ocrBlur = new cv.Mat();
+    cv.GaussianBlur(ocrGray, ocrBlur, new cv.Size(3,3),0);
+    //二値化
+    let ocrBinary = new cv.Mat();
+    cv.threshold(ocrBlur, ocrBinary, 0,255,cv.THRESH_BAINARY + cv.THRESH_OTSU);
+    //文字膨張
+    let kernel2 = cv.Mat.ones(1,1,cv.CV_8U);
+    cv.dilate(ocrBinary,ocrBinary, kernel2,);
+
+    //RGBに戻す
+    let ocrReady = new cv.Mat();
+    //cv.cvtColor(dst, rgb, cv.COLOR_RGBA2RGB);
+    cv.cvtColor(ocrBinary, ocrReady, cv.COLOR_RGBA2RGB);
+
+    cv.imshow("outputCanvas", ocrReady);
 
 // ⭐ 補正後の Mat → Base64 PNG に変換
     const tmpCanvas = document.createElement("canvas");
-    tmpCanvas.width = rgb.cols;
-    tmpCanvas.height = rgb.rows;
-    cv.imshow(tmpCanvas, rgb);
+    tmpCanvas.width = ocrReady.cols;
+    tmpCanvas.height = ocrReady.rows;
+    cv.imshow(tmpCanvas, ocrReady);
 
     const base64 = tmpCanvas.toDataURL("image/png");
 
     // メモリ解放（rgb も追加）
-    cleanup([gray, blur, edged, kernel, contours, hierarchy, approx, srcTri, dstTri, M, dst, rgb]);
+    cleanup([gray, blur, edged, kernel, contours, hierarchy, approx, srcTri, dstTri, M, dst, rgb, ocrGray, ocrBlur, ocrBinary, kernel2, ocrReady]);
 
     return base64;
   } catch (e) {
